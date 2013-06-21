@@ -1,0 +1,124 @@
+<html>
+<head>
+	<title>
+	DNSandMX : Add a DNS domain
+	</title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "user_name">
+		<h3 style = "margin-top: 0px; margin-bottom: 2px">
+			<tmpl_var name = "banner_user" fmt = "de_xss" /></h3>
+		<span class = "lighter small">
+			Last login: <tmpl_var name = "last_login" /> (UTC) from 			<tmpl_var name = "last_login_from" fmt = "de_xss" />
+		</span>
+	</div>
+	<div class = "logo">
+		<img src = "/static/images/logo.png" alt = "logo" />
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+| <a href = "/logout/">Logout</a> | <a href = "/ips_and_hosts/">IPs and Hosts</a> | <a href = "/settings/">Settings</a> | <a href = "/overview/">Overview</a> |
+
+<h2 class = "lighter">Add a DNS domain</h2>
+<p />
+
+<form action = "/add_dns_domain/" method = "POST">
+
+<tmpl_if name = "domain_exists">
+<big><big class = "exp_expired">
+	Domain already exists in our database!
+</big></big>
+<p />
+</tmpl_if>
+
+<table>
+<tbody>
+<tr>
+	<td>Please enter your domain name </td>
+	<td>
+		<input type = "text" name = "dax_domain"
+			value = "<tmpl_var name = 'dax_domain'
+			fmt = 'de_xss' />"
+			size = "30" maxlength = "255" class =
+			"<tmpl_if name = 'domain_error'>
+				input_error
+			</tmpl_if>
+			" autofocus />
+	</td>
+</tr>
+<tr>
+	<td>Please specify a hostmaster address</td>
+	<td>
+		<input type = "email" name = "dax_hostmaster"
+			value = "<tmpl_var name = 'dax_hostmaster'
+			fmt = 'de_xss' />"
+			size = "30" maxlength = "255" class =
+			"<tmpl_if name = 'hostmaster_error'>
+				input_error
+			</tmpl_if>
+			" />
+	<td><b>@</b> will be replaced with a <b>.</b> in the SOA record</td>
+	</td>
+</tr>
+<tr>
+	<td rowspan = "2">Please select hosting type</td>
+	<td>
+		<input type = "radio" name = "server_type" value = "primary"
+			<tmpl_if name = 'server_type' value = 'MASTER'>
+				checked
+			</tmpl_if> /> Primary (master)
+	</td>
+	<td>
+		Primary is to have DNSandMX manage your records.
+	</td>
+</tr>
+<tr>
+	<td>
+		<input type = "radio" name = "server_type" value = "secondary"
+			<tmpl_if name = 'server_type' value = 'SLAVE'>
+				checked
+			</tmpl_if> /> Secondary (slave)
+	</td>
+	<td>
+		Secondary is to have DNSandMX act as a slave server to your existing master.
+	</td>
+</tr>
+<tr>
+	<td class = "lighter">If you chose 'Secondary', enter the IP address of your master name server.</td>
+	<td>
+		<input type = "text" name = "dax_master"
+			value = "<tmpl_var name = 'dax_master' />"
+			size = "20" maxlength = "128" class =
+			"<tmpl_if name = 'master_error'>
+				input_error
+			</tmpl_if>
+			" />
+	</td>
+</tr>
+</tbody>
+</table>
+
+<p />
+
+<div style = "width; 100%">
+<div style = "width: 90%; float: left;">
+	<input type = "hidden" name = "csrf_token" value =
+		"<tmpl_var name = 'csrf_token' />" />
+	<button type = "submit" class = "btn_green">Add</button>
+	</form>
+</div>
+<div style = "width: 90%; float: right;">
+	<form action = "/overview/" method = "GET">
+	<button type = "submit" class = "btn_red">Back</button>
+	</form>
+</div>
+</div>
+
+</body>
+</html>

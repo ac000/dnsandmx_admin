@@ -1,0 +1,213 @@
+<html>
+<head>
+	<title>
+		DNSandMX : <tmpl_var name = "type" fmt = "upper" /> records for
+		<tmpl_var name = "domain" />
+	</title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "user_name">
+		<h3 style = "margin-top: 0px; margin-bottom: 2px">
+			<tmpl_var name = "banner_user" fmt = "de_xss" /></h3>
+		<span class = "lighter small">
+			Last login: <tmpl_var name = "last_login" /> (UTC) from 			<tmpl_var name = "last_login_from" fmt = "de_xss" />
+		</span>
+	</div>
+	<div class = "logo">
+		<img src = "/static/images/logo.png" alt = "logo" />
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+| <a href = "/logout/">Logout</a> | <a href = "/ips_and_hosts/">IPs and Hosts</a> | <a href = "/settings/">Settings</a> | <a href = "/overview/">Overview</a> |
+<p />
+Record type&nbsp;
+<tmpl_if name = "type" value = "soa">
+| <span class = "lighter">SOA</span>&nbsp;
+<tmpl_else>
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=soa">SOA</a>&nbsp;
+</tmpl_if>
+<tmpl_if name = "type" value = "ns">
+| <span class = "lighter">NS</span>&nbsp;
+<tmpl_else>
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=ns">NS</a>&nbsp;
+</tmpl_if>
+<tmpl_if name = "type" value = "a">
+| <span class = "lighter">A</span>&nbsp;
+<tmpl_else>
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=a">A</a>&nbsp;
+</tmpl_if>
+<tmpl_if name = "type" value = "aaaa">
+| <span class = "lighter">AAAA</span>&nbsp;
+<tmpl_else>
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=aaaa">AAAA</a>&nbsp;
+</tmpl_if>
+<tmpl_if name = "type" value = "cname">
+| <span class = "lighter">CNAME</span>&nbsp;
+<tmpl_else>
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=cname">CNAME</a>&nbsp;
+</tmpl_if>
+<tmpl_if name = "type" value = "loc">
+| <span class = "lighter">LOC</span>&nbsp;
+<tmpl_else>
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=loc">LOC</a>&nbsp;
+</tmpl_if>
+<tmpl_if name = "type" value = "mx">
+| <span class = "lighter">MX</span>&nbsp;
+<tmpl_else>
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=mx">MX</a>&nbsp;
+</tmpl_if>
+<tmpl_if name = "type" value = "naptr">
+| <span class = "lighter">NAPTR</span>&nbsp;
+<tmpl_else>
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=naptr">NAPTR</a>&nbsp;
+</tmpl_if>
+<tmpl_if name = "type" value = "ptr">
+| <span class = "lighter">PTR</span>&nbsp;
+<tmpl_else>
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=ptr">PTR</a>&nbsp;
+</tmpl_if>
+<tmpl_if name = "type" value = "rp">
+| <span class = "lighter">RP</span>&nbsp;
+<tmpl_else>
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=rp">RP</a>&nbsp;
+</tmpl_if>
+<tmpl_if name = "type" value = "spf">
+| <span class = "lighter">SPF</span>&nbsp;
+<tmpl_else>
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=spf">SPF</a>&nbsp;
+</tmpl_if>
+<tmpl_if name = "type" value = "srv">
+| <span class = "lighter">SRV</span>&nbsp;
+<tmpl_else>
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=srv">SRV</a>&nbsp;
+</tmpl_if>
+<tmpl_if name = "type" value = "txt">
+| <span class = "lighter">TXT</span>&nbsp;
+<tmpl_else>
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=txt">TXT</a>&nbsp;
+</tmpl_if>
+|
+
+<br />
+
+<h2>
+	<tmpl_var name = "type" fmt = "upper" /><span class = "lighter"> records
+	<small>
+		(<tmpl_var name = "nr" />)
+	</small> for </span>
+	<tmpl_var name = "domain" />
+	<br />
+	<small class ="lighter">
+	<tmpl_if name = "type" value = "ns">
+		These are the name servers for your domain
+	</tmpl_if>
+	<tmpl_if name = "type" value = "a">
+		These map names to IPv4 addresses
+	</tmpl_if>
+	<tmpl_if name = "type" value = "aaaa">
+		These map names to IPv6 addresses
+	</tmpl_if>
+	<tmpl_if name = "type" value = "cname">
+		These are aliases to other host names (Canonical Name)
+	</tmpl_if>
+	<tmpl_if name = "type" value = "loc">
+		These specify the locations of hosts/networks
+	</tmpl_if>
+	<tmpl_if name = "type" value = "mx">
+		These define what hosts accept mail for your domain
+	</tmpl_if>
+	<tmpl_if name = "type" value = "naptr">
+		These define Naming Authority Pointer records for your domain
+	</tmpl_if>
+	<tmpl_if name = "type" value = "ptr">
+		These typically map IP addresses to names
+	</tmpl_if>
+	<tmpl_if name = "type" value = "rp">
+		These define Responsible Person records for your domain
+	</tmpl_if>
+	<tmpl_if name = "type" value = "spf">
+		These define Sender Policy Framework records for your domain
+	</tmpl_if>
+	<tmpl_if name = "type" value = "srv">
+		These allow you to set Service records for your domain
+	</tmpl_if>
+	<tmpl_if name = "type" value = "txt">
+		These allow you to associate arbitary text to your records
+	</tmpl_if>
+	</small>
+</h2>
+<p />
+
+	<table>
+	<tbody>
+	<tr>
+	<tmpl_if name = "field_a">
+		<td><strong><tmpl_var name = "field_a" /></strong></td>
+	</tmpl_if>
+	<tmpl_if name = "field_b">
+		<td><strong><tmpl_var name = "field_b" /></strong></td>
+	</tmpl_if>
+	<tmpl_if name = "field_c">
+		<td><strong><tmpl_var name = "field_c" /></strong></td>
+	</tmpl_if>
+	<tmpl_if name = "field_d">
+		<td><strong><tmpl_var name = "field_d" /></strong></td>
+	</tmpl_if>
+	<tmpl_if name = "stype" value = "MASTER">
+		<td width = "20"></td>
+		<td class = "lighter">Last Modified <small>(UTC)</small></td>
+		<td></td>
+		<td width = "40"></td>
+		<td></td>
+	</tmpl_if>
+	</tr>
+<tmpl_loop name = "records">
+<tmpl_if name = "zebra" value = "yes">
+	<tr class = "listzebra">
+<tmpl_else>
+	<tr>
+</tmpl_if>
+	<tmpl_if name = "field_a">
+		<td><tmpl_var name = "name" fmt = "de_xss" /></td>
+	</tmpl_if>
+	<tmpl_if name = "field_b">
+		<td><tmpl_var name = "content" fmt = "de_xss" /></td>
+	</tmpl_if>
+	<tmpl_if name = "field_c">
+		<td><tmpl_var name = "prio" fmt = "de_xss" /></td>
+	</tmpl_if>
+	<tmpl_if name = "field_d">
+		<td><tmpl_var name = "ttl" /></td>
+	</tmpl_if>
+	<tmpl_if name = "stype" value = "MASTER">
+		<td></td>
+		<td class = "lighter"><tmpl_var name = "cdate" fmt = "datetime" /></td>
+		<td><a href = "/<tmpl_var name = 'type' />_record/?domain_id=<tmpl_var name = 'domain_id' />&record_id=<tmpl_var name = 'record_id' />"><img src = "/static/images/edit.png" height = "20" alt = "edit record" /> edit</a>
+		</td>
+		<td></td>
+		<td><form action = "/delete_dns_record/?domain_id=<tmpl_var name = 'domain_id' />&record_id=<tmpl_var name = 'record_id' />&type=<tmpl_var name = 'type' />" method = "POST">
+		<input type = "hidden" name = "csrf_token"
+			value = "<tmpl_var name = 'csrf_token' />" />
+		<input type = "submit" class = "form_btn_red" value = "delete" />
+		</form>
+		</td>
+	</tmpl_if>
+	</tr>
+</tmpl_loop>
+
+	</tbody>
+	</table>
+
+<tmpl_if name = "stype" value = "MASTER">
+<br />
+<a href = "/<tmpl_var name = "type" />_record/?domain_id=<tmpl_var name = 'domain_id' />" id = "add"><img src = "/static/images/add.png" width = "16" height = "16" alt = "add record" /></a> <b>Add a record</b>
+</tmpl_if>
+
+</body>
+</html>

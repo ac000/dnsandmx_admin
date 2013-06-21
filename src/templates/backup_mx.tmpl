@@ -1,0 +1,67 @@
+<html>
+<head>
+	<title>DNSandMX : Backup Mail Exchanger for <tmpl_var name = "domain" fmt = "de_xss" /></title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "user_name">
+		<h3 style = "margin-top: 0px; margin-bottom: 2px">
+			<tmpl_var name = "banner_user" fmt = "de_xss" /></h3>
+		<span class = "lighter small">
+			Last login: <tmpl_var name = "last_login" /> (UTC) from 			<tmpl_var name = "last_login_from" fmt = "de_xss" />
+		</span>
+	</div>
+	<div class = "logo">
+		<img src = "/static/images/logo.png" alt = "logo" />
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+| <a href = "/logout/">Logout</a> | <a href = "/ips_and_hosts/">IPs and Hosts</a> | <a href = "/settings/">Settings</a> | <a href = "/overview/">Overview</a> |
+<br />
+
+<h2>
+Backup MX<span class = "lighter"> for </span><tmpl_var name = "domain" fmt = "de_xss" />
+</h2>
+<p />
+
+<h3 class = "lighter">
+There are <span class = "hblue"><tmpl_var name = "queue_sz"></span> messages in the queue.
+</h3>
+
+<p />
+
+<tmpl_if name = "etrn_ok" value = "yes">
+	<h4 class = "lighter">Delivery is currently being attempted.</h4>
+	<p />
+<tmpl_elsif name = "etrn_ok" value = "no">
+	<h4 class = "lighter">Could not issue ETRN. Please try again later.</h4>
+	<p />
+</tmpl_if>
+
+<tmpl_if name = "queue_sz" value = "0">
+<tmpl_else>
+<div style = "width; 100%">
+<div style = "width: 90%; float: left;">
+	<form action = "/issue_etrn/" method = "POST">
+	<input type = "hidden" name = "domain_id"
+		value = "<tmpl_var name = 'domain_id' />" />
+	<input type = "hidden" name = "domain"
+		value = "<tmpl_var name = 'domain' fmt = 'de_xss' />" />
+	<input type = "hidden" name = "csrf_token"
+		value = "<tmpl_var name = 'csrf_token' />" />
+	<button type = "submit" class = "btn_green">ETRN</button>
+        </form>
+</div>
+<div style = "width: 90%; float: right;" class = "lighter">
+	Have queued messages delivered immediately
+</div>
+</div>
+</tmpl_if>
+
+</body>
+</html>

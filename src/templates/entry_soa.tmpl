@@ -1,0 +1,123 @@
+<html>
+<head>
+	<title>DNSandMX : SOA entry for <tmpl_var name = "domain" fmt = "de_xss" /></title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "user_name">
+		<h3 style = "margin-top: 0px; margin-bottom: 2px">
+			<tmpl_var name = "banner_user" fmt = "de_xss" /></h3>
+		<span class = "lighter small">
+			Last login: <tmpl_var name = "last_login" /> (UTC) from 			<tmpl_var name = "last_login_from" fmt = "de_xss" />
+		</span>
+	</div>
+	<div class = "logo">
+		<img src = "/static/images/logo.png" alt = "logo" />
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+| <a href = "/logout/">Logout</a> | <a href = "/ips_and_hosts/">IPs and Hosts</a> | <a href = "/settings/">Settings</a> | <a href = "/overview/">Overview</a> |
+<p />
+Record type&nbsp;
+| <span class = "lighter">SOA</span>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=ns">NS</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=a">A</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=aaaa">AAAA</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=cname">CNAME</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=loc">LOC</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=mx">MX</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=naptr">NAPTR</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=ptr">PTR</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=rp">RP</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=spf">SPF</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=srv">SRV</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=txt">TXT</a>&nbsp;
+|
+
+<br />
+
+<h2>
+SOA<span class = "lighter"> for </span><tmpl_var name = "domain" fmt = "de_xss" /><br />
+<small class ="lighter">This contains some general information about the domain</small>
+</h2>
+<p />
+
+<tmpl_if name = "axfr_done" value = "no">
+<h1>Still waiting to do initial AXFR.</h1>
+<tmpl_else>
+
+<tmpl_if name = "type" value = "MASTER">
+	<span class = "lighter">Last modified (UTC): <tmpl_var name = "cdate"
+	fmt = "datetime" /></span>
+	<p />
+</tmpl_if>
+
+	<table>
+	<tbody>
+	<tr>
+		<td width = "170px"><strong>Serial</strong></td>
+		<td><tmpl_var name = "serial" /></td>
+	</tr>
+	<tr>
+		<td><strong>Primary Server</strong></td>
+		<td><tmpl_var name = "pns" fmt = "de_xss" /></td>
+	</tr>
+	<tr>
+		<td><strong>Hostmaster</strong></td>
+		<td><tmpl_var name = "hostmaster" fmt = "de_xss" /></td>
+	</tr>
+	<tr>
+		<td><strong>Refresh</strong></td>
+		<td><tmpl_var name = "refresh" /></td>
+	</tr>
+	<tr>
+		<td><strong>Retry</strong></td>
+		<td><tmpl_var name = "retry" /></td>
+	</tr>
+	<tr>
+		<td><strong>Expire</strong></td>
+		<td><tmpl_var name = "expire" /></td>
+	</tr>
+	<tr>
+		<td><strong>Negative TTL</strong></td>
+		<td><tmpl_var name = "ncttl" /></td>
+	</tr>
+	<tr>
+		<td><strong> Default TTL</strong></td>
+		<td><tmpl_var name = "ttl" /></td>
+	</tr>
+	</tbody>
+	</table>
+
+<p />
+
+<tmpl_if name = "type" value = "MASTER">
+	<a href = "/soa_record/?domain_id=<tmpl_var name = 'domain_id' />&record_id=<tmpl_var name = 'record_id' />"><img src = "/static/images/edit.png" height = "20" alt = "edit record" /> edit</a>
+<tmpl_else>
+	<br />
+
+	<table>
+	<tbody>
+	<tr>
+		<td><b>Master Address</b><br />
+			<span class = "lighter small">
+				Where we pull the zone data from
+			</span>
+		</td>
+		<td style = "vertical-align: top;"><tmpl_var name = "mip" /></td>
+		<td width = "20px"></td>
+		<td style = "vertical-align: top;"><a href = "/master_ns_ip/?domain_id=<tmpl_var name = 'domain_id' />"><img src = "/static/images/edit.png" height = "20" alt = "edit record" />&nbsp;&nbsp;edit</a></td>
+	</tr>
+	</tbody>
+	</table>
+</tmpl_if>
+
+</tmpl_if>
+
+</body>
+</html>

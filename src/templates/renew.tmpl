@@ -1,0 +1,101 @@
+<html>
+<head>
+	<title>DNSandMX : Renew DNS domain <tmpl_var name = "domain" fmt =
+		"de_xss" /></title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "user_name">
+		<h3 style = "margin-top: 0px; margin-bottom: 2px">
+			<tmpl_var name = "banner_user" fmt = "de_xss" /></h3>
+		<span class = "lighter small">
+			Last login: <tmpl_var name = "last_login" /> (UTC) from
+			<tmpl_var name = "last_login_from" fmt = "de_xss" />
+		</span>
+	</div>
+	<div class = "logo">
+	<img src = "/static/images/logo.png" alt = "logo" />
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+| <a href = "/logout/">Logout</a> | <a href = "/ips_and_hosts/">IPs and Hosts</a> | <a href = "/settings/">Settings</a> | <a href = "/overview/">Overview</a> |
+<p />
+
+<h2 class = "lighter">Renew <span class = "hblue"><tmpl_if name =
+	"type" value = "dns">DNS<tmpl_else>Mail</tmpl_if></span> domain
+	<span class = "hblue"><tmpl_var name = "domain" fmt = "de_xss" />
+	</span>
+</h2>
+
+<tmpl_if name = "efunds" value = "yes">
+<h2 class = "lighter">You do not have sufficient funds for this action.</h2>
+<h2>
+DNS <span class = "lighter">domains are $</span>10<br />
+Mail <span class = "lighter">domains are $</span>15
+</h2>
+<h2 class = "lighter">Your available funds are $<span class ="hblue"><tmpl_var
+	name = "funds" />
+</h2>
+<h2 class = "lighter"><a href = "/add_funds/">Add</a> funds now</h2>
+
+<tmpl_else>
+<h2 class = "lighter">You are about to renew a <tmpl_if name = "type" value =
+	"dns">DNS<tmpl_else>Mail</tmpl_if> domain for one more year @ <span
+	class = "lighter">$</span><span class = "hblue"><tmpl_if name = "type"
+	value = "dns">10<tmpl_else>15</tmpl_if></span>
+	<p />
+	This will leave you with $<span class = "hblue"><tmpl_var name
+	= "f_remain" /></span>
+	<p />
+	The new expiry date for this domain will be <span class = "hblue">
+	<tmpl_var name = "n_expires" fmt = "date" /></span>
+</h2>
+<p />
+<h3 class = "lighter">
+In order to confirm this action, you must re-authenticate.
+</h3>
+<p />
+
+<tmpl_if name = 'auth_err'>
+<b>Authentication Failure</b>
+<br />
+</tmpl_if>
+
+<form action = "/renew/" method = "POST">
+<input type = "password" name = "password" autocomplete = "off" placeholder =
+	"enter password" size = "15" class = "
+	<tmpl_if name = 'auth_err'>/>
+		input_error
+	</tmpl_if>
+	" />
+<input type = "hidden" name = "domain_id" value =
+	"<tmpl_var name = 'domain_id' />" />
+<input type = "hidden" name = "type" value =
+	"<tmpl_var name = 'type' />" />
+<input type = "hidden" name = "username" value =
+	"<tmpl_var name = 'username' fmt = 'de_xss' />" />
+<input type = "hidden" name = "csrf_token" value =
+	"<tmpl_var name = 'csrf_token' />" />
+<p />
+
+<div style = "width; 100%">
+<div style = "width: 90%; float: left;">
+	<button type = "submit" class = "btn_green">Renew</button>
+	</form>
+</div>
+<div style = "width: 90%; float: right;">
+	<form action = "/overview/" method = "GET">
+	<button type = "submit" class = "btn_red">Back</button>
+	</form>
+</div>
+</div>
+
+</tmpl_if> <!-- insufficient funds -->
+
+</body>
+</html>

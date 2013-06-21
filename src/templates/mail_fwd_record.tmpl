@@ -1,0 +1,115 @@
+<html>
+<head>
+	<title>
+	<tmpl_if name = "update">
+	DNSandMX : Update a mail forward record under <tmpl_var name = "domain" fmt = "de_xss" />
+	<tmpl_else>
+	DNSandMX : Add a mail forward record to <tmpl_var name = "domain" fmt = "de_xss" />
+	</tmpl_if>
+	</title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "user_name">
+		<h3 style = "margin-top: 0px; margin-bottom: 2px">
+			<tmpl_var name = "banner_user" fmt = "de_xss" /></h3>
+		<span class = "lighter small">
+			Last login: <tmpl_var name = "last_login" /> (UTC) from 			<tmpl_var name = "last_login_from" fmt = "de_xss" />
+		</span>
+	</div>
+	<div class = "logo">
+		<img src = "/static/images/logo.png" alt = "logo" />
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+| <a href = "/logout/">Logout</a> | <a href = "/ips_and_hosts/">IPs and Hosts</a> | <a href = "/settings/">Settings</a> | <a href = "/overview/">Overview</a>
+<p />
+
+<h2 class = "lighter">
+<tmpl_if name = "update">
+Update a <span class = "hblue">mail forward</span> record under
+<tmpl_else>
+Add a <span class = "hblue">mail forward</span> record to
+</tmpl_if>
+<span class = "hblue">
+<tmpl_var name = "domain" fmt = "de_xss" />
+</span>
+</h2>
+<p />
+
+<form action = "/mail_fwd_record/" method = "POST">
+
+<table>
+<tbody>
+	<tr>
+		<td>Source</td>
+		<td><input type = "text" name = "dax_mfs"
+			value = "<tmpl_var name = 'dax_mfs'
+			fmt = 'de_xss' />" autofocus
+			size = "16" maxlength = "200" class =
+			"<tmpl_if name = 'mfs_error'>
+				input_error
+			</tmpl_if>
+			" />@<tmpl_var name = "domain" fmt = "de_xss" />
+		</td>
+		<td width = "20"></td>
+		<td class = "lighter">Enter a name or leave blank (for catch all)</td>
+	</tr>
+	<tr>
+		<td>Destination</td>
+		<td><input type = "email" name = "dax_mfd"
+			value = "<tmpl_var name = 'dax_mfd'
+			fmt = 'de_xss' />"
+			size = "30" maxlength = "255" class =
+			"<tmpl_if name = 'mfd_error'>
+				input_error
+			</tmpl_if>
+                        " />
+		</td>
+		<td></td>
+		<td class = "lighter">Enter the destination email address</td>
+	</tr>
+</tbody>
+</table>
+
+<input type = "hidden" name = "domain_id"
+	value = "<tmpl_var name = 'domain_id' />" />
+<tmpl_if name = "record_id" >
+<input type = "hidden" name = "record_id"
+	value = "<tmpl_var name = 'record_id' />" />
+</tmpl_if>
+<input type = "hidden" name = "domain"
+	value = "<tmpl_var name = 'domain' fmt = 'de_xss' />" />
+<tmpl_if name = "update" >
+<input type = "hidden" name = "update" value = "update" />
+</tmpl_if>
+<input type = "hidden" name = "o_src"
+	value = "<tmpl_var name = 'o_src' fmt = 'de_xss' />" />
+<input type = "hidden" name = "csrf_token"
+	value = "<tmpl_var name = 'csrf_token' />" />
+
+<p />
+
+<div style = "width; 100%">
+<div style = "width: 90%; float: left;">
+	<button type = "submit" class = "btn_green">
+	<tmpl_if name = "update" >Update<tmpl_else>Add</tmpl_if>
+	</button>
+	</form>
+</div>
+<div style = "width: 90%; float: right;">
+	<form action = "/mail_forwarding/" method = "GET">
+	<input type = "hidden" name = "domain_id"
+		value = "<tmpl_var name = 'domain_id' />" />
+	<button type = "submit" class = "btn_red">Back</button>
+	</form>
+</div>
+</div>
+
+</body>
+</html>

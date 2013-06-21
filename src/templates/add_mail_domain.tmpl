@@ -1,0 +1,101 @@
+<html>
+<head>
+	<title>
+	DNSandMX : Add a Mail domain
+	</title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "user_name">
+		<h3 style = "margin-top: 0px; margin-bottom: 2px">
+			<tmpl_var name = "banner_user" fmt = "de_xss" /></h3>
+		<span class = "lighter small">
+			Last login: <tmpl_var name = "last_login" /> (UTC) from 			<tmpl_var name = "last_login_from" fmt = "de_xss" />
+		</span>
+	</div>
+	<div class = "logo">
+		<img src = "/static/images/logo.png" alt = "logo" />
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+| <a href = "/logout/">Logout</a> | <a href = "/ips_and_hosts/">IPs and Hosts</a> | <a href = "/settings/">Settings</a> | <a href = "/overview/">Overview</a> |
+
+<h2 class = "lighter">Add a Mail domain</h2>
+<p />
+
+<form action = "/add_mail_domain/" method = "POST">
+
+<tmpl_if name = "domain_exists">
+<big><big>Domain already exists in our database!</big></big>
+<p />
+</tmpl_if>
+
+<table>
+<tbody>
+<tr>
+	<td width = "230px">Please enter your domain name </td>
+	<td>
+		<input type = "text" name = "dax_domain"
+			value = "<tmpl_var name = 'dax_domain'
+			fmt = 'de_xss' />" size = "30" maxlength = "255"
+			class = "
+			<tmpl_if name = 'domain_error'>
+				input_error
+			</tmpl_if>
+			" autofocus />
+	</td>
+</tr>
+<tr>
+	<td><br /></td>
+</tr>
+<tr>
+	<td rowspan = "3">Please select mail service type</td>
+	<td>
+		<input type = "radio" name = "mail_type" value = "MX"
+			<tmpl_if name = 'mail_type' value = 'MX'>
+				checked
+			</tmpl_if> /> Backup Mail Exchanger
+	</td>
+	<td>
+		We will accept and store mail for your domain while your primary mail server is off-line and then deliver it to your primary server when it comes back on-line.
+	</td>
+</tr>
+	<td><br /></td>
+<tr>
+	<td>
+		<input type = "radio" name = "mail_type" value = "FWD"
+			<tmpl_if name = 'mail_type' value = 'FWD'>
+				checked
+			</tmpl_if> /> Mail Forwarding
+	</td>
+	<td>
+		We will act as your mail servers and forward mail to your specified email addresses.
+	</td>
+</tr>
+
+</tbody>
+</table>
+
+<p />
+
+<div style = "width; 100%">
+<div style = "width: 90%; float: left;">
+	<input type = "hidden" name = "csrf_token" value =
+		"<tmpl_var name = 'csrf_token' />" />
+	<button type = "submit" class = "btn_green">Add</button>
+	</form>
+</div>
+<div style = "width: 90%; float: right;">
+	<form action = "/overview/" method = "GET">
+	<button type = "submit" class = "btn_red">Back</button>
+	</form>
+</div>
+</div>
+
+</body>
+</html>

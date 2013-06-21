@@ -1,0 +1,99 @@
+Overview
+========
+
+dnsandmx_admin has been built and run under RHEL 6 (x86_64) and Fedora 18
+(x86_64).
+
+It is a FastCGI application written in C.
+
+Requirements
+============
+
+To build you will need at least the following (older versions may work)
+
+    glib2{-devel}-2.22.5
+    gmime{-devel}-2.2.26
+    mhash{-devel}-0.9.9.9
+    mysql{-devel}-5.1.69
+    fcgi{-devel}-2.4.0
+    tokyocabinet{-devel}-1.4.33
+    curl{-devel}-7.19.7
+
+and the otl branch of libctemplate from
+
+    git://github.com/opentechlabs/libctemplate.git
+
+
+You will also need the powerdns and postfix software for the DNS and mail
+stuff.
+
+incrond is also used on the backup mx host for monitoring the postfix deferred
+queue directories.
+
+See docs/watch_defer_queue for a suitable incron.d entry. The base
+update_queue_sz.sh script is in scripts/. This makes use of the qshape program
+from the postfix-perl-scripts package.
+
+
+Build
+=====
+
+Something like this
+
+    $ git clone git://github.com/dnsandmx/dnsandmx_admin.git
+    $ git clone git://github.com/opentechlabs/libctemplate.git
+
+libctemplate
+
+    $ cd libctemplate
+    $ git checkout -b otl origin/otl
+    $ make
+    $ ln -s libctemplate-fcgx.so.1.4.0 libctemplate-fcgx.so
+    $ ln -s libctemplate-fcgx.so.1.4.0 libctemplate-fcgx.so.1
+
+dnsandmx_admin
+
+    $ cd src
+    $ ln -s ../../libctemplate libctemplate
+    $ make
+
+
+Install
+=======
+
+    Create three databases (dnsandmx_admin, pdns and postfix) using the three
+    database schema's in the db/ directory.
+
+    Follow the instructions in docs/db_setup to create the required users.
+
+    Place the dax binary the templates/ directory somewhere and put the static/
+    directory somewhere where it can be served by a web server.
+
+
+Configuration
+=============
+
+    It needs some basic configuration. This is done through the dax.cfg file.
+
+    There is an example configuration file in the config/ directory which
+    contains a minimal set of needed config options.
+
+    To see the full list of config options, look at docs/config.txt
+
+    Stick this in /usr/local/etc or somesuch, be sure to give it restricted
+    permissions as it contains passwords etc.
+
+
+Run
+===
+
+    The application itself is started with the spawn-fcgi command, something
+    like
+
+    $ export LD_LIBRARY_PATH=/path/to/libctemplate spawn-fcgi -a 127.0.0.1 -p 9191 -P /tmp/dax.pid -- /path/to/dax /usr/local/etc/dax.cfg
+
+    The 9191 is the port that the application is listening on, the one that is
+    specified in nginx.conf
+
+    See the start_dax.sh script in the scripts/ directory for an example. This
+    script assumes that libctemplate is in the library path.

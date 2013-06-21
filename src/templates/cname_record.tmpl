@@ -1,0 +1,145 @@
+<html>
+<head>
+	<title>
+	<tmpl_if name = "update">
+	DNSandMX : Update CNAME record under <tmpl_var name = "domain" fmt = "de_xss" />
+	<tmpl_else>
+	DNSandMX : Add a CNAME record to <tmpl_var name = "domain" fmt = "de_xss" />
+	</tmpl_if>
+	</title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "user_name">
+		<h3 style = "margin-top: 0px; margin-bottom: 2px">
+			<tmpl_var name = "banner_user" fmt = "de_xss" /></h3>
+		<span class = "lighter small">
+			Last login: <tmpl_var name = "last_login" /> (UTC) from 			<tmpl_var name = "last_login_from" fmt = "de_xss" />
+		</span>
+	</div>
+	<div class = "logo">
+		<img src = "/static/images/logo.png" alt = "logo" />
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+| <a href = "/logout/">Logout</a> | <a href = "/ips_and_hosts/">IPs and Hosts</a> | <a href = "/settings/">Settings</a> | <a href = "/overview/">Overview</a> |
+<p />
+
+Record type&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=soa">SOA</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=ns">NS</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=a">A</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=aaaa">AAAA</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=cname">CNAME</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=loc">LOC</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=mx">MX</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=naptr">NAPTR</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=ptr">PTR</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=rp">RP</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=spf">SPF</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=srv">SRV</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=txt">TXT</a>&nbsp;
+|
+
+<br />
+
+<h2 class = "lighter">
+<tmpl_if name = "update">
+Update <span class = "hblue">CNAME</span> record under
+<tmpl_else>
+Add a <span class = "hblue">CNAME</span> record to
+</tmpl_if>
+<span class = "hblue">
+<tmpl_var name = "domain" fmt = "de_xss" />
+</span>
+</h2>
+<p />
+
+<form action = "/cname_record/" method = "POST">
+
+<table>
+<tbody>
+	<tr>
+		<td>Alias</td>
+		<td><input type = "text" name = "dax_hostname"
+			value = "<tmpl_var name = 'dax_hostname'
+			fmt = 'de_xss' />" autofocus
+			size = "16" maxlength = "63" class =
+			"<tmpl_if name = 'hostname_error'>
+				input_error
+			</tmpl_if>
+			" />.<tmpl_var name = "domain" fmt = "de_xss" />
+		</td>
+		<td width = "20"></td>
+		<td class = "lighter">Enter the alias for the host</td>
+	</tr>
+	<tr>
+		<td>Canonical Name</td>
+		<td><input type = "text" name = "dax_content"
+			value = "<tmpl_var name = 'dax_content'
+			fmt = 'de_xss' />"
+			size = "16" maxlength = "255" class =
+			"<tmpl_if name = 'content_error'>
+				input_error
+			</tmpl_if>
+                        " />
+		</td>
+		<td></td>
+		<td class = "lighter">Enter the canonical name for the host</td>
+	</tr>
+	<tr>
+		<td>TTL</td>
+		<td><input type = "text" name = "dax_ttl"
+			value = "<tmpl_var name = 'dax_ttl' fmt = 'de_xss' />"
+			size = "8" maxlength = "11" class =
+			"<tmpl_if name = 'ttl_error'>
+				input_error
+			</tmpl_if>
+			" />
+		</td>
+		<td></td>
+		<td class = "lighter">Enter the time to live for this record</td>
+	</tr>
+</tbody>
+</table>
+
+<input type = "hidden" name = "domain_id"
+	value = "<tmpl_var name = 'domain_id' />" />
+<tmpl_if name = "record_id" >
+<input type = "hidden" name = "record_id"
+	value = "<tmpl_var name = 'record_id' />" />
+</tmpl_if>
+<input type = "hidden" name = "domain"
+	value = "<tmpl_var name = 'domain' fmt = 'de_xss' />" />
+<tmpl_if name = "update" >
+<input type = "hidden" name = "update" value = "update" />
+</tmpl_if>
+<input type = "hidden" name = "csrf_token"
+	value = "<tmpl_var name = 'csrf_token' />" />
+
+<p />
+
+<div style = "width; 100%">
+<div style = "width: 90%; float: left;">
+	<button type = "submit" class = "btn_green">
+	<tmpl_if name = "update" >Update<tmpl_else>Add</tmpl_if>
+	</button>
+	</form>
+</div>
+<div style = "width: 90%; float: right;">
+	<form action = "/records/" method = "GET">
+	<input type = "hidden" name = "domain_id"
+		value = "<tmpl_var name = 'domain_id' />" />
+	<input type = "hidden" name = "type" value = "cname" />
+	<button type = "submit" class = "btn_red">Back</button>
+	</form>
+</div>
+</div>
+
+</body>
+</html>

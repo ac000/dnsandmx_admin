@@ -1,0 +1,42 @@
+Database users
+==============
+
+DNS
+---
+
+On the master server
+
+CREATE USER 'pdns'@'localhost' IDENTIFIED BY 'PASSWORD';
+CREATE USER 'dnsandmx'@'localhost' IDENTIFIED BY 'PASSWORD';
+GRANT ALL ON pdns.* TO 'pdns'@'localhost';
+GRANT ALL ON pdns.* TO 'dnsandmx'@'localhost';
+GRANT ALL ON dnsandmx_admin.* TO 'dnsandmx'@'localhost';
+FLUSH PRIVILEGES;
+
+On slave servers
+
+CREATE USER 'pdns'@'localhost' IDENTIFIED BY 'PASSWORD';
+CREATE USER 'dnsandmx'@'MASTER SERVER' IDENTIFIED BY 'PASSWORD';
+GRANT ALL ON pdns.* TO 'pdns'@'localhost';
+GRANT ALL ON pdns.* TO 'dnsandmx'@'MASTER SERVER';
+FLUSH PRIVILEGES;
+
+
+Mail
+----
+
+On mx1
+------
+
+CREATE USER 'postfix'@'localhost' IDENTIFIED BY 'PASSWORD';
+GRANT SELECT, UPDATE ON postfix.* TO 'postfix'@'localhost';
+GRANT ALL ON postfix.* TO 'dnsandmx'@'localhost';
+FLUSH PRIVILEGES;
+
+On mx2
+------
+
+CREATE USER 'postfix'@'localhost' IDENTIFIED BY 'PASSWORD';
+GRANT SELECT, UPDATE ON postfix.* TO 'postfix'@'localhost';
+GRANT ALL ON postfix.* TO 'dnsandmx'@'MASTER SERVER';
+FLUSH PRIVILEGES;

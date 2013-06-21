@@ -1,0 +1,43 @@
+<html>
+<head>
+	<title>DNSandMX : Sign Up</title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "logo">
+	<a href = "http://<tmpl_var name = 'www_host' fmt = 'de_xss' />/">
+	<img src = "/static/images/logo.png" alt = "logo" />
+	</a>
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+<tmpl_if name = "user_exists" value = "yes">
+<h2 class = "lighter">There is already an account under this email address.</h2>
+<h3 class = "lighter">Click <a href = "/forgotten_password/">here</a> if you have forgotten your password.</h3>
+<tmpl_elsif name = "no_email" value = "yes">
+<h2 class = "lighter">Please provide a valid email address.</h2>
+<tmpl_else>
+<h2 class = "lighter">An account activation email has been sent to <span class
+	= "hblue"><tmpl_var name = 'email_addr' fmt = 'de_xss' /></h2>
+
+<big class = "lighter">
+It will come from <b>noreply@dnsandmx.com</b> with the subject of <b>DNSandMX
+Account Activation</b>
+<p />
+Once you receive this email you need to visit the link within, either by
+clicking it or by copy and pasting it into your browser.
+<p />
+This link is valid for 24 hours, after which you will need to sign up again.
+<p />
+If you fail to receive the email check your spam filters etc. You can sign up
+again within the 24 hour period to have a new activation email sent to you.
+</big>
+</tmpl_if>
+
+</body>
+</html>

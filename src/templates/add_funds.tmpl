@@ -1,0 +1,119 @@
+<html>
+<head>
+	<title>DNSandMX : Fund your account</title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "user_name">
+		<h3 style = "margin-top: 0px; margin-bottom: 2px">
+			<tmpl_var name = "banner_user" fmt = "de_xss" /></h3>
+		<span class = "lighter small">
+			Last login: <tmpl_var name = "last_login" /> (UTC) from
+			<tmpl_var name = "last_login_from" fmt = "de_xss" />
+		</span>
+	</div>
+	<div class = "logo">
+	<img src = "/static/images/logo.png" alt = "logo" />
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+| <a href = "/logout/">Logout</a> | <a href = "/ips_and_hosts/">IPs and Hosts</a> | <a href = "/settings/">Settings</a> | <a href = "/overview/">Overview</a> |
+<p />
+
+<h2 class = "lighter">Add funds to your account</h2>
+<big class = "lighter">
+You can add as much as you like, but it must be at least $5 and be a multiple
+of 5.
+</big>
+<p />
+<span class = "lighter">
+You can pay using your PayPal account or you can pay with your debit/credit
+card (processed through PayPal, but no PayPal account required; select the
+"Pay with a debit or credit card" link on the PayPal page).
+</span>
+<p />
+
+<tmpl_if name = "amount_error" value = "no">
+<br />
+<center>
+	<big><big>
+		You are about to add $<span class = "hblue"><tmpl_var name = "dax_amount" /></span> to your account.
+	</big></big>
+	<p />
+
+	<form action = "https://<tmpl_var name = 'paypal_host'
+			fmt = 'de_xss' />/cgi-bin/webscr" method = "POST"
+			target = "_top">
+	<input type = "hidden" name = "cmd" value = "_xclick" />
+	<input type = "hidden" name = "business" value =
+		"<tmpl_var name = 'paypal_bid' fmt = 'de_xss' />" />
+	<input type = "hidden" name = "page_style" value = "DNSandMX" />
+	<input type = "hidden" name = "currency_code" value = "USD" />
+	<input type = "hidden" name = "quantity" value = "1" />
+	<input type = "hidden" name = "item_name" value = "Add Funds" />
+	<input type = "hidden" name = "amount" value =
+		"<tmpl_var name = 'dax_amount' />">
+	<input type = "hidden" name = "no_shipping" value = "1">
+	<input type = "hidden" name = "no_note" value = "1">
+	<input type = "hidden" name = "custom" value =
+		"<tmpl_var name = 'uid' />" />
+<!--	<input type = "hidden" name = "notify_url" value =
+		"" /> -->
+	<input type = "hidden" name  = "cancel_return" value =
+		"https://<tmpl_var name = 'app_host' fmt =
+		'de_xss' />/overview/" />
+	<input type = "hidden" name = "return" value =
+		"https://<tmpl_var name = 'app_host' fmt =
+		'de_xss' />/overview/" />
+	<input type = "hidden" name = "rm" value = "1" />
+	<input type = "hidden" name = "cbt" value =
+		"Return to DNSandMX Account Overiew" />
+	<input type = "image" src = "/static/images/proceed.png"
+		width = "125" border = "0" name = "submit" alt =
+		"PayPal – The safer, easier way to pay online." />
+	</form>
+</center>
+<p />
+<br />
+<center class = "lighter">
+Note: It may take a few moments for the transaction to show on your account.
+</center>
+<tmpl_else>
+<br />
+<center>
+<form action = "/add_funds/" method = "POST">
+<table>
+<tbody>
+<tr>
+<td>
+	<big>$</big><input type = "input" name = "dax_amount" autofocus value =
+		"<tmpl_var name = 'dax_amount' />" size = "5" maxlength = "8"
+		class = "<tmpl_if name = 'amount_error' value = 'yes'>
+			input_error
+		</tmpl_if>
+		" />
+</td>
+<td>
+	<input type = "image" src = "/static/images/proceed.png"
+		height = "35" border = "0" name = "submit" alt = "proceed" />
+</td>
+</tr>
+</tbody>
+</table>
+<input type = "hidden" name = "csrf_token" value =
+	"<tmpl_var name = 'csrf_token' />" />
+</form>
+</center>
+</tmpl_if>
+
+<div style = "position: absolute; bottom: 0px; width: 98%; margin-left: auto; margin-right: auto;">
+<!-- PayPal Logo --><table border="0" cellpadding="10" cellspacing="0" align="center"><tr><td align="center"></td></tr><tr><td align="center"><a href="https://www.paypal.com/uk/webapps/mpp/paypal-popup" title="How PayPal Works" onclick="javascript:window.open('https://www.paypal.com/uk/webapps/mpp/paypal-popup','WIPaypal','toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=1060, height=700'); return false;"><img src="https://www.paypalobjects.com/webstatic/mktg/logo/AM_mc_vs_ms_ae_UK.jpg" border="0" alt="PayPal Acceptance Mark"></a></td></tr></table><!-- PayPal Logo -->
+</div>
+
+</body>
+</html>

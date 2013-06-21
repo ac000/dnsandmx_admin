@@ -1,0 +1,16 @@
+/var/spool/postfix/defer/0 IN_CLOSE_WRITE,IN_DELETE /usr/local/sbin/update_queue_sz.sh
+/var/spool/postfix/defer/1 IN_CLOSE_WRITE,IN_DELETE /usr/local/sbin/update_queue_sz.sh
+/var/spool/postfix/defer/2 IN_CLOSE_WRITE,IN_DELETE /usr/local/sbin/update_queue_sz.sh
+/var/spool/postfix/defer/3 IN_CLOSE_WRITE,IN_DELETE /usr/local/sbin/update_queue_sz.sh
+/var/spool/postfix/defer/4 IN_CLOSE_WRITE,IN_DELETE /usr/local/sbin/update_queue_sz.sh
+/var/spool/postfix/defer/5 IN_CLOSE_WRITE,IN_DELETE /usr/local/sbin/update_queue_sz.sh
+/var/spool/postfix/defer/6 IN_CLOSE_WRITE,IN_DELETE /usr/local/sbin/update_queue_sz.sh
+/var/spool/postfix/defer/7 IN_CLOSE_WRITE,IN_DELETE /usr/local/sbin/update_queue_sz.sh
+/var/spool/postfix/defer/8 IN_CLOSE_WRITE,IN_DELETE /usr/local/sbin/update_queue_sz.sh
+/var/spool/postfix/defer/9 IN_CLOSE_WRITE,IN_DELETE /usr/local/sbin/update_queue_sz.sh
+/var/spool/postfix/defer/A IN_CLOSE_WRITE,IN_DELETE /usr/local/sbin/update_queue_sz.sh
+/var/spool/postfix/defer/B IN_CLOSE_WRITE,IN_DELETE /usr/local/sbin/update_queue_sz.sh
+/var/spool/postfix/defer/C IN_CLOSE_WRITE,IN_DELETE /usr/local/sbin/update_queue_sz.sh
+/var/spool/postfix/defer/D IN_CLOSE_WRITE,IN_DELETE /usr/local/sbin/update_queue_sz.sh
+/var/spool/postfix/defer/E IN_CLOSE_WRITE,IN_DELETE /usr/local/sbin/update_queue_sz.sh
+/var/spool/postfix/defer/F IN_CLOSE_WRITE,IN_DELETE /usr/local/sbin/update_queue_sz.sh

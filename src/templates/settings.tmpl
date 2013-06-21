@@ -1,0 +1,138 @@
+<html>
+<head>
+	<title>DNSandMX : Settings</title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "user_name">
+		<h3 style = "margin-top: 0px; margin-bottom: 2px">
+			<tmpl_var name = "banner_user" fmt = "de_xss" /></h3>
+		<span class = "lighter small">
+			Last login: <tmpl_var name = "last_login" /> (UTC) from 			<tmpl_var name = "last_login_from" fmt = "de_xss" />
+		</span>
+	</div>
+	<div class = "logo">
+		<img src = "/static/images/logo.png" alt = "logo" />
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+| <a href = "/logout/">Logout</a> | <a href = "/ips_and_hosts/">IPs and Hosts</a> | <span class = "lighter">Settings</span> | <a href = "/overview/">Overview</a> |
+<p />
+
+<tmpl_if name = "updated" value = "yes">
+	<h2 class = "lighter">Your settings were  <span class =
+		"hblue">updated</span>
+	</h2>
+<tmpl_else>
+	<h2 class = "lighter">Your current settings</h2>
+</tmpl_if>
+
+	<p />
+
+	<form action = "/settings/" method = "POST">
+	<table>
+	<tbody>
+	<tr>
+	<td>Name </td>
+	<td><input type = "text" name = "dax_name" value =
+		"<tmpl_var name = 'dax_name' fmt = 'de_xss' />" size = "25"
+		maxlength = "255" class = "
+		<tmpl_if name = 'name_error'>
+			input_error
+		</tmpl_if>
+		" />
+	</td>
+	</tr>
+	<tr><td><br /></td></tr>
+	<tr>
+	<td></td>
+	<td>
+		<tmpl_if name = "email_error">
+			<big><span class = "t_red">Usernames do not match</span></big><br />
+		<tmpl_elsif name = "user_exists">
+			<big><span class = "t_red">Username already exists</span></big><br />
+		</tmpl_if>
+	</td>
+	</tr>
+	<tr>
+	<td><br />Username </td>
+	<td>
+		<big><span class = "lighter">Username should be your email address</span></big><br />
+		<input type = "email" name = "dax_email1" value =
+		"<tmpl_var name = 'dax_email1' fmt = 'de_xss' />" size = "30"
+		maxlength = "255" class = "
+		<tmpl_if name = 'email_error'>
+			input_error
+		</tmpl_if>
+		" />
+	</td>
+	</tr>
+	<tr>
+	<td>Re-type </td>
+	<td><input type = "email" name = "dax_email2" value =
+		"<tmpl_var name = 'dax_email2' fmt = 'de_xss' />" size = "30"
+		maxlength = "255" class = "
+		<tmpl_if name = 'email_error'>
+			input_error
+		</tmpl_if>
+		" />
+	</td>
+	</tr>
+	<tr><td><br /></td></tr>
+	<tr>
+	<td></td>
+	<td>
+		<tmpl_if name = "pass_error" value = "mismatch">
+			<span class = "t_red">Passwords do not match</span><br />
+		<tmpl_elsif name = "pass_error" value = "length">
+			<span class = "t_red">Password should be at least 8 characters long</span><br />
+		</tmpl_if>
+	</td>
+	</tr>
+	<tr>
+	<td>Password </td>
+	<td>
+		<input type = "password" name = "dax_pass1" size = "12"
+		maxlength = "64" autocomplete = "off" class = "
+		<tmpl_if name = 'pass_error'>
+			input_error
+		</tmpl_if>
+		" />
+	</td>
+	</tr>
+	<tr>
+	<td>Re-type </td>
+	<td><input type = "password" name = "dax_pass2" size = "12"
+		maxlength = "64" autocomplete = "off" class = "
+		<tmpl_if name = 'pass_error'>
+			input_error
+		</tmpl_if>
+		" />
+	</td>
+	</tr>
+	</tbody>
+	</table>
+
+<p />
+
+<div style = "width; 100%">
+<div style = "width: 90%; float: left;">
+	<input type = "hidden" name = "csrf_token" value =
+		"<tmpl_var name = 'csrf_token' />" />
+	<button type = "submit" class = "btn_green">Update</button>
+	</form>
+</div>
+<div style = "width: 90%; float: right;">
+	<form action = "/overview/" method = "GET">
+	<button type = "submit" class = "btn_red">Overview</button>
+	</form>
+</div>
+</div>
+
+</body>
+</html>

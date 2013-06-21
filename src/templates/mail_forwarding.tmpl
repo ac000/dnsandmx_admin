@@ -1,0 +1,73 @@
+<html>
+<head>
+	<title>DNSandMX : Mail forwarding for <tmpl_var name = "domain" fmt = "de_xss" /></title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "user_name">
+		<h3 style = "margin-top: 0px; margin-bottom: 2px">
+			<tmpl_var name = "banner_user" fmt = "de_xss" /></h3>
+		<span class = "lighter small">
+			Last login: <tmpl_var name = "last_login" /> (UTC) from 			<tmpl_var name = "last_login_from" fmt = "de_xss" />
+		</span>
+	</div>
+	<div class = "logo">
+		<img src = "/static/images/logo.png" alt = "logo" />
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+| <a href = "/logout/">Logout</a> | <a href = "/ips_and_hosts/">IPs and Hosts</a> | <a href = "/settings/">Settings</a> | <a href = "/overview/">Overview</a> |
+<p />
+
+<h2>
+Mail forwarding<span class = "lighter"> for </span><tmpl_var name = "domain" fmt = "de_xss" />
+<br />
+<small class ="lighter">Configure your mail forwarding aliases</small>
+</h2>
+<p />
+
+	<table>
+	<tbody>
+	<tr>
+		<td><strong>Source</strong></td>
+		<td><strong>Destination</strong></td>
+		<td width = "20"></td>
+		<td></td>
+		<td width = "40"></td>
+		<td></td>
+	</tr>
+<tmpl_loop name = "records">
+<tmpl_if name = "zebra" value = "yes">
+	<tr class = "listzebra">
+<tmpl_else>
+	<tr>
+</tmpl_if>
+	<td><tmpl_var name = "source" fmt = "de_xss" /></td>
+	<td><tmpl_var name = "destination" fmt = "de_xss" /></td>
+	<td></td>
+	<td><a href = "/mail_fwd_record/?domain_id=<tmpl_var name = 'domain_id' />&record_id=<tmpl_var name = 'record_id' />"><img src = "/static/images/edit.png" height = "20" alt = "edit record" /> edit</a>
+	</td>
+	<td></td>
+	<td><form action = "/delete_mail_fwd_record/?domain_id=<tmpl_var name = 'domain_id' />&source=<tmpl_var name = 'source' fmt = 'de_xss' />" method = "POST">
+		<input type = "hidden" name = "csrf_token"
+			value = "<tmpl_var name = 'csrf_token' />" />
+		<input type = "submit" class = "form_btn_red"
+			value = "delete" />
+                </form>
+	</td>
+	</tr>
+</tmpl_loop>
+	</tbody>
+	</table>
+
+<p />
+
+<a href = "/mail_fwd_record/?domain_id=<tmpl_var name = 'domain_id' />" id = "add"><img src = "/static/images/add.png" width = "16" height = "16" alt = "add mail forward record" /></a> <b><small>Add a mail forward record</small></b>
+
+</body>
+</html>

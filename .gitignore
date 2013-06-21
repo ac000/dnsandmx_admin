@@ -1,0 +1,5 @@
+*.swp
+config/dax.cfg
+src/*.o
+src/dax
+src/libctemplate

@@ -1,0 +1,78 @@
+<html>
+<head>
+	<title>DNSandMX : Account Login</title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+<div class = "user_wrapper">
+	<div class = "logo">
+	<a href = "http://<tmpl_var name = 'www_host' fmt = 'de_xss' />/">
+	<img src = "/static/images/logo.png" alt = "logo" /></a>
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+	<center>
+<tmpl_if name = "logged_in" value = "no">
+	<big><span class = "input_error">Login Failure. Please try again</span></big><p />
+<tmpl_elsif name = "enabled" value = "no">
+	<big><span class = "input_error">Account has been disabled</span></big><p />
+</tmpl_if>
+	<h1 style = "color: #000000;">Welcome to your <span style =
+		"color: #647ba4;">DNS</span><span style =
+		"color: #828282;">and</span><span style =
+		"color: #647ba4;">MX</span> Account Login</h1>
+	<p />
+	<form action = "/login/" method = "POST">
+	<table>
+	<tbody style = "font-size: 18px;">
+	<tr>
+		<td>
+		<input type = "email" name = "username" size = "32"
+			maxlength = "255" placeholder = "Username"
+			style = "font-size: 18px;" />
+		</td>
+	</tr>
+	<tr>
+		<td>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		<input type = "password" name = "password" size = "32"
+			maxlength = "255" placeholder = "Password"
+			style = "font-size: 18px;" />
+		</td>
+	</tr>
+	</tbody>
+	</table>
+
+	<small>Restrict this session to your IP address: <input type =
+		"checkbox" name = "restrict_ip" value = "true" checked />
+	</small>
+	<p />
+
+	<input type = "image" src = "/static/images/login.png" border = "0"
+		height = "36" alt = "Log In" />
+
+	</form>
+	<p />
+	<br />
+	<span class = "lighter">Forgotten your password? Click <a href = "/reset_password/">here</a>.</span>
+	</center>
+
+	<div id = "cookie_note">
+	<small>
+	<strong>NOTE: </strong>This site requires functioning <a href = "http://en.wikipedia.org/wiki/HTTP_cookie">cookies</a>. When you log in, one cookie, "session_id" is created in your browser. This is used for security to identify you to the application during your session.
+	<p />
+	The cookie is set to last only for the current browser session (<a href = "http://en.wikipedia.org/wiki/HTTP_cookie#Session_cookie">session cookie</a>) and if you use the "logout" link, it will be removed immediately.
+	</small>
+	</div>
+
+	<footer>
+	<small>&copy; DNSandMX 2013.</small>
+	</footer>
+</body>
+</html>

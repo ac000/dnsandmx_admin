@@ -1,0 +1,20 @@
+Overview
+========
+
+This is the DNSandMX administration application that users use to configure
+their domains.
+
+It allows them to manage DNS (Primary or Secondary) for their domains. As well
+as set up Backup Mail Exchangers or Mail Forwarding for their domains, whoever
+they use to manage their DNS.
+
+It is built on top of, PowerDNS, Postfix, MySQL and more...
+
+The application itself is a FastCGI application written in C.
+
+See http://dnsandmx.com/ for full details on what we offer.
+
+See docs/INSTALL for a somewhat terse getting started guide.
+
+This software is licensed under the GNU Affero General Public License
+Version 3. See the AGPL-3.0.txt file for details.

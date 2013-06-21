@@ -1,0 +1,157 @@
+@font-face {
+        font-family: 'FreeUniversa';
+        src: url('/static/fonts/FreeUniversal-Regular.ttf');
+}
+
+body {
+	font-family: 'FreeUniversa', sans-serif;
+	font-size: 14px;
+	margin: 15px;
+}
+
+img {
+	border-style: none;
+}
+
+a, a:link, a:visited {
+	color: #0d398b;
+	text-decoration: none;
+}
+
+td {
+	vertical-align: middle;
+	padding-right: 15px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	color: #647ba4;
+}
+
+.small {
+	font-size: small;
+}
+
+.large {
+        font-size: large;
+}
+
+.lighter {
+	color: #828282;
+}
+
+.lighter_blue {
+	color: #8b9fc4;
+}
+
+.hblue {
+	color: #647ba4;
+}
+
+.exp_warn {
+	color: #146604;
+}
+
+.exp_expired {
+	color: #770008;
+}
+
+.t_red {
+	color: rgb(255, 0, 0);
+}
+
+.t_blue {
+        color: rgb(0, 0, 255);
+}
+
+.t_yellow {
+	color: rgb(230, 160, 70);
+}
+
+.t_green {
+	color: rgb(0, 255, 0);
+}
+
+.input_error {
+	background-color: rgb(240, 180, 175);
+}
+
+.list {
+	vertical-align: top;
+}
+
+.listzebra {
+	vertical-align: top;
+	background-color: rgb(245, 250, 255);
+}
+
+.user_wrapper {
+	width: 100%;
+}
+
+.user_name {
+	float: left;
+	width: 70%;
+}
+
+.logo {
+	float: right;
+	width: 30%;
+	text-align: right;
+}
+
+#cookie_note {
+	position: relative;
+	height: 100px;
+	width: 670px;
+	margin: 80 auto;
+	background: #b2b2b2;
+	padding-right: 10px;
+	padding-left: 10px;
+	padding-top: 20px;
+}
+
+.form_btn_red {
+	padding: 0;
+	margin: 0;
+	height: 20px;
+	font-size: 10px;
+	position: absolute;
+	border: none;
+	background-color: #dc1616;
+	color: #ffffff;
+	cursor: pointer;
+}
+
+.form_btn_blue {
+	padding: 0;
+	margin: 0;
+	height: 18px;
+	font-size: 10px;
+	position: absolute;
+	border: none;
+	background-color: #005ecc;
+	color: #ffffff;
+	cursor: pointer;
+}
+
+.btn_green {
+	padding: 5px;
+	margin: 5px;
+	position: absolute;
+	border: none;
+	background-color: #57cf48;
+	color: #ffffff;
+	cursor: pointer;
+	width: 80px;
+}
+
+.btn_red {
+	padding: 5px;
+	margin: 5px;
+	position: absolute;
+	border: none;
+	background-color: #dc1616;
+	color: #ffffff;
+	cursor: pointer;
+	width: 80px;
+}

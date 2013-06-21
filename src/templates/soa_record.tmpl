@@ -1,0 +1,181 @@
+<html>
+<head>
+	<title>
+	DNSandMX : Update SOA record for <tmpl_var name = "domain" fmt = "de_xss" />
+	</title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "user_name">
+		<h3 style = "margin-top: 0px; margin-bottom: 2px">
+			<tmpl_var name = "banner_user" fmt = "de_xss" /></h3>
+		<span class = "lighter small">
+			Last login: <tmpl_var name = "last_login" /> (UTC) from 			<tmpl_var name = "last_login_from" fmt = "de_xss" />
+		</span>
+	</div>
+	<div class = "logo">
+		<img src = "/static/images/logo.png" alt = "logo" />
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+| <a href = "/logout/">Logout</a> | <a href = "/ips_and_hosts/">IPs and Hosts</a> | <a href = "/settings/">Settings</a> | <a href = "/overview/">Overview</a> |
+<p />
+Record type&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=soa">SOA</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=ns">NS</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=a">A</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=aaaa">AAAA</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=cname">CNAME</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=loc">LOC</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=mx">MX</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=naptr">NAPTR</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=ptr">PTR</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=rp">RP</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=spf">SPF</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=srv">SRV</a>&nbsp;
+| <a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=txt">TXT</a>&nbsp;
+|
+
+<br />
+
+<h2 class = "lighter">
+Update <span class = "hblue">SOA</span> record under
+<span class = "hblue">
+<tmpl_var name = "domain" fmt = "de_xss" />
+</span>
+</h2>
+<p />
+
+<form action = "/soa_record/" method = "POST">
+
+<table>
+<tbody>
+	<tr>
+		<td>Primary Name Server</td>
+		<td><input type = "text" name = "dax_pns"
+			value = "<tmpl_var name = 'dax_pns'
+			fmt = 'de_xss' />"
+			size = "22" maxlength = "255" class =
+			"<tmpl_if name = 'hostname_error'>
+				input_error
+			</tmpl_if>
+			" />
+		</td>
+		<td width = "20"></td>
+		<td class = "lighter">Enter the name of the primary nameserver for this domain</td>
+	</tr>
+	<tr>
+		<td>Hostmaster Address</td>
+		<td><input type = "email" name = "dax_hostmaster"
+			value = "<tmpl_var name = 'dax_hostmaster'
+			fmt = 'de_xss' />"
+			size = "22" maxlength = "255" class =
+			"<tmpl_if name = 'hostmaster_error'>
+				input_error
+			</tmpl_if>
+                        " />
+		</td>
+		<td width = "20"></td>
+		<td class = "lighter">Enter the email address of the hostmaster for this domain</td>
+	</tr>
+	<tr>
+		<td>Refresh</td>
+		<td><input type = "text" name = "dax_refresh"
+			value = "<tmpl_var name = 'dax_refresh' />"
+			size = "6" maxlength = "11" class =
+			"<tmpl_if name = 'refresh_error'>
+				input_error
+			</tmpl_if>
+			" />
+		</td>
+		<td width = "20"></td>
+		<td class = "lighter">Enter the refresh period in seconds</td>
+	</tr>
+	<tr>
+		<td>Retry</td>
+		<td><input type = "text" name = "dax_retry"
+			value = "<tmpl_var name = 'dax_retry' />"
+			size = "6" maxlength = "11" class =
+			"<tmpl_if name = 'retry_error'>
+				input_error
+			</tmpl_if>
+			" />
+		</td>
+		<td width = "20"></td>
+		<td class = "lighter">Enter the retry period in seconds</td>
+	</tr>
+	<tr>
+		<td>Expire</td>
+		<td><input type = "text" name = "dax_expire"
+			value = "<tmpl_var name = 'dax_expire' />"
+			size = "6" maxlength = "11" class =
+			"<tmpl_if name = 'expire_error'>
+				input_error
+			</tmpl_if>
+			" />
+		</td>
+		<td width = "20"></td>
+		<td class = "lighter">Enter the expiry period in seconds</td>
+	</tr>
+	<tr>
+		<td>Negative Caching TTL</td>
+		<td><input type = "text" name = "dax_ncttl"
+			value = "<tmpl_var name = 'dax_ncttl' />"
+			size = "6" maxlength = "11" class =
+			"<tmpl_if name = 'ncttl_error'>
+				input_error
+			</tmpl_if>
+			" />
+		</td>
+		<td width = "20"></td>
+		<td class = "lighter">Enter the negative caching time to live period in seconds</td>
+	</tr>
+	<tr>
+		<td>Default TTL</td>
+		<td><input type = "text" name = "dax_ttl"
+			value = "<tmpl_var name = 'dax_ttl' />"
+			size = "6" maxlength = "11" class =
+			"<tmpl_if name = 'refresh_error'>
+				input_error
+			</tmpl_if>
+			" />
+		</td>
+		<td width = "20"></td>
+		<td class = "lighter">Enter the default time to live for this domain</td>
+	</tr>
+</tbody>
+</table>
+
+<input type = "hidden" name = "domain_id"
+	value = "<tmpl_var name = 'domain_id' />" />
+<input type = "hidden" name = "record_id"
+	value = "<tmpl_var name = 'record_id' />" />
+<input type = "hidden" name = "domain"
+	value = "<tmpl_var name = 'domain' fmt = 'de_xss' />" />
+<input type = "hidden" name = "csrf_token"
+	value = "<tmpl_var name = 'csrf_token' />" />
+
+<p />
+
+<div style = "width; 100%">
+<div style = "width: 90%; float: left;">
+	<button type = "submit" class = "btn_green">Update</button>
+	</form>
+</div>
+<div style = "width: 90%; float: right;">
+	<form action = "/records/" method = "GET">
+	<input type = "hidden" name = "domain_id"
+		value = "<tmpl_var name = 'domain_id' />" />
+	<input type = "hidden" name = "type" value = "soa" />
+	<button type = "submit" class = "btn_red">Back</button>
+	</form>
+</div>
+</div>
+
+</body>
+</html>

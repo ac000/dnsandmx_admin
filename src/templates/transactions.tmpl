@@ -1,0 +1,70 @@
+<html>
+<head>
+	<title>
+		DNSandMX : Transactions
+	</title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "user_name">
+		<h3 style = "margin-top: 0px; margin-bottom: 2px">
+			<tmpl_var name = "banner_user" fmt = "de_xss" /></h3>
+		<span class = "lighter small">
+			Last login: <tmpl_var name = "last_login" /> (UTC) from 			<tmpl_var name = "last_login_from" fmt = "de_xss" />
+		</span>
+	</div>
+	<div class = "logo">
+		<img src = "/static/images/logo.png" alt = "logo" />
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+| <a href = "/logout/">Logout</a> | <a href = "/ips_and_hosts/">IPs and Hosts</a> | <a href = "/settings/">Settings</a> | <a href = "/overview/">Overview</a> |
+<p />
+
+<h2>
+Your transaction history
+</h2>
+<p />
+
+<table>
+<tbody>
+<tr>
+	<td></td>
+	<td><strong>Amount</strong></td>
+	<td><strong>Status</strong></td>
+	<td><strong>Reason</strong></td>
+	<td><strong>Note</strong></td>
+	<td><strong>Date</strong> <small class = "lighter">(UTC)</small></td>
+</tr>
+<tmpl_loop name = "transactions">
+<tmpl_if name = "zebra" value = "yes">
+	<tr class = "listzebra">
+<tmpl_else>
+	<tr>
+</tmpl_if>
+	<td align = "center"><tmpl_if name = "t_stat" value = "IN">
+		<img src = "/static/images/add.png" height = "14" />
+	    <tmpl_elsif name = "t_stat" value = "OUT">
+		<img src = "/static/images/remove.png" width = "20" height = "10" />
+	    <tmpl_elsif name = "t_stat" value = "error">
+		<img src = "/static/images/atencion.png" height = "14" />
+	    </tmpl_if>
+	</td>
+	<td><span class = "lighter">$</span><tmpl_var name = "amount" /></td>
+	<td><tmpl_var name = "status" fmt = "de_xss" /></td>
+	<td><tmpl_var name = "reason" fmt = "de_xss" /></td>
+	<td><tmpl_var name = "note" fmt = "de_xss" /></td>
+	<td><tmpl_var name = "datetime" fmt = "datetime" /></td>
+</tr>
+</tmpl_loop>
+
+</tbody>
+</table>
+
+</body>
+</html>

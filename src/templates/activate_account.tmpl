@@ -1,0 +1,101 @@
+<html>
+<head>
+	<title>DNSandMX : Account Activation</title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "logo">
+		<a href = "http://<tmpl_var name = 'www_host' fmt = 'de_xss' />/"><img src = "/static/images/logo.png" alt = "logo" /></a>
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+<tmpl_if name = "activated" value = "yes">
+	<h2 class = "lighter">Your account has been activated.</span></h2>
+	<h3 class = "lighter">Click <a href = "/login/">here</a> to login.</h3>
+<tmpl_elsif name = "no_key" value = "yes">
+	<h2 class = "lighter">No matching activation key found. This is most
+	likely due to it expiring. Simply sign up again to have another
+	activation link sent to you.</span></h2>
+<tmpl_else>
+	<h2 style = "color: #000000;"><span style =
+		"color: #647ba4;">DNS</span><span style =
+		"color: #828282;">and</span><span style =
+		"color: #647ba4;">MX</span> Account Activation for
+		<span class = "hblue"><tmpl_var name = "email_addr" fmt =
+		"de_xss" /></h2>
+	<h3 class = "lighter">
+	To complete your account activation, please provide your name and set a
+	password. The password should be at least 8 characters long. Your
+	username is your email address.
+	</h3>
+	<p />
+
+	<form action = "/activate_account/" method = "POST">
+	<table>
+	<tbody>
+	<tr>
+	<td>Name </td>
+	<td><input type = "text" name = "dax_name" value =
+		"<tmpl_var name = 'dax_name' fmt = 'de_xss' />" size = "25"
+		maxlength = "255" class = "
+		<tmpl_if name = 'name_error'>
+			input_error
+		</tmpl_if>
+		" />
+	</td>
+	</tr>
+	<tr><td><br /></td></tr>
+	<tr>
+	<td></td>
+	<td>
+		<tmpl_if name = "pass_error" value = "mismatch">
+			<span class = "t_red">Passwords do not match</span><br />
+		<tmpl_elsif name = "pass_error" value = "length">
+			<span class = "t_red">Password should be at least 8 characters long</span><br />
+		</tmpl_if>
+	</td>
+	</tr>
+	<tr>
+	<td>Password </td>
+	<td>
+		<input type = "password" name = "dax_pass1" size = "12"
+		maxlength = "64" autocomplete = "off" class = "
+		<tmpl_if name = 'pass_error'>
+			input_error
+		</tmpl_if>
+		" />
+	</td>
+	</tr>
+	<tr>
+	<td>Re-type </td>
+	<td><input type = "password" name = "dax_pass2" size = "12"
+		maxlength = "64" autocomplete = "off" class = "
+		<tmpl_if name = 'pass_error'>
+			input_error
+		</tmpl_if>
+		" />
+	</td>
+	</tr>
+	</tbody>
+	</table>
+
+<p />
+
+<div style = "width; 100%">
+<div style = "width: 90%; float: left;">
+	<input type = "hidden" name = "key" value = "<tmpl_var name = 'key'
+		fmt = 'de_xss' />" />
+	<input type = "image" src = "/static/images/activate.png" border = "0"
+		height = "36" name = "submit" alt = "Activate" />
+	</form>
+</div>
+</div>
+</tmpl_if>
+
+</body>
+</html>

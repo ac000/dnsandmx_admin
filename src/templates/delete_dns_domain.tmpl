@@ -1,0 +1,68 @@
+<html>
+<head>
+	<title>DNSandMX : Delete DNS domain <tmpl_var name = "domain" fmt = "de_xss" /></title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "user_name">
+		<h3 style = "margin-top: 0px; margin-bottom: 2px">
+			<tmpl_var name = "banner_user" fmt = "de_xss" /></h3>
+		<span class = "lighter small">
+			Last login: <tmpl_var name = "last_login" /> (UTC) from 			<tmpl_var name = "last_login_from" fmt = "de_xss" />
+		</span>
+	</div>
+	<div class = "logo">
+		<img src = "/static/images/logo.png" alt = "logo" />
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+| <a href = "/logout/">Logout</a> | <a href = "/ips_and_hosts/">IPs and Hosts</a> | <a href = "/settings/">Settings</a> | <a href = "/overview/">Overview</a> |
+<p />
+
+<h2 class = "lighter">Request to delete <span class = "hblue">DNS</span> domain </span><span class = "hblue"><tmpl_var name = "domain" fmt = "de_xss" /></span></h2>
+<h2 class = "lighter">You are about to delete an entire DNS domain and all its records.</h2>
+<p />
+<h3 class = "lighter">In order to confirm this action, you must re-authenticate.</h3>
+<p />
+
+<tmpl_if name = 'auth_err'>
+<b>Authentication Failure</b>
+<br />
+</tmpl_if>
+
+<form action = "/delete_dns_domain/" method = "POST">
+<input type = "password" name = "password" autocomplete = "off" placeholder =
+	"enter password" size = "15" class = "
+	<tmpl_if name = 'auth_err'>/>
+		input_error
+	 </tmpl_if>
+	" />
+<input type = "hidden" name = "domain_id" value =
+	"<tmpl_var name = 'domain_id' />" />
+<input type = "hidden" name = "domain" value =
+	"<tmpl_var name = 'domain' fmt = 'de_xss' />" />
+<input type = "hidden" name = "username" value =
+	"<tmpl_var name = 'username' fmt = 'de_xss' />" />
+<input type = "hidden" name = "csrf_token" value =
+	"<tmpl_var name = 'csrf_token' />" />
+<p />
+
+<div style = "width; 100%">
+<div style = "width: 90%; float: left;">
+	<button type = "submit" class = "btn_red">Delete</button>
+	</form>
+</div>
+<div style = "width: 90%; float: right;">
+	<form action = "/overview/" method = "GET">
+	<button type = "submit" class = "btn_green">Back</button>
+	</form>
+</div>
+</div>
+
+</body>
+</html>

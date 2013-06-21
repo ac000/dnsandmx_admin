@@ -1,0 +1,141 @@
+<html>
+<head>
+	<title>DNSandMX : Account Overview</title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "user_name">
+		<h3 style = "margin-top: 0px; margin-bottom: 2px">
+			<tmpl_var name = "banner_user" fmt = "de_xss" /></h3>
+		<span class = "lighter small">
+			Last login: <tmpl_var name = "last_login" /> (UTC) from 			<tmpl_var name = "last_login_from" fmt = "de_xss" />
+		</span>
+	</div>
+	<div class = "logo">
+		<a href = "http://<tmpl_var name = 'www_host' fmt = 'de_xss'
+		/>/"><img src = "/static/images/logo.png" alt = "logo" /></a>
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+| <a href = "/logout/">Logout</a> | <a href = "/ips_and_hosts/">IPs and Hosts</a> | <a href = "/settings/">Settings</a> | <span class = "lighter">Overview</span> |
+<p />
+
+<h2><span class = "lighter">Account Overview :: Funds </span>$<tmpl_var name = "funds" /> <small><small><a href = "/add_funds/">add funds</a><span class = "lighter">,</span> <a href = "/transactions/">transactions</a></small></small></h2>
+<p />
+
+<h2>DNS <small><span class = "lighter">(<tmpl_var name = "nr_dns" />)</span></small></h2>
+<p />
+
+	<table>
+	<tbody>
+	<tr>
+		<td><strong>Domain</strong></td>
+		<td><strong>Type</strong></td>
+		<td><strong>Last Checked</strong> <span class = "lighter small">(UTC)</span></td>
+		<td><strong>Added</strong></td>
+		<td><strong>Expires</strong></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td width = "20"></td>
+		<td></td>
+	</tr>
+<tmpl_loop name = "dns">
+<tmpl_if name = "zebra" value = "yes">
+	<tr class = "listzebra">
+<tmpl_else>
+	<tr>
+</tmpl_if>
+		<td><tmpl_var name = "domain" fmt = "de_xss" /></td>
+		<td><tmpl_var name = "type" /></td>
+		<td><tmpl_var name = "last_check" fmt = "datetime" /></td>
+		<td><tmpl_var name = "added" fmt = "date" /></td>
+		<td class = "<tmpl_if name = 'exp' value = 'warn'>exp_warn<tmpl_elsif name = 'exp' value = 'expired'>exp_expired<tmpl_else></tmpl_if>"><tmpl_var name = "expires" fmt = "date" /></td>
+		<td></td>
+		<td><a href = "/renew/?domain_id=<tmpl_var name = 'domain_id' />&type=dns"><img src = "/static/images/refresh.png" height = "20" alt = "renew dns domain" />&nbsp;renew</a></td>
+		<td></td>
+<tmpl_if name = "exp" value = "expired">
+		<td></td>
+<tmpl_elsif name = "type" value = "Primary">
+		<td><a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=soa"><img src = "/static/images/edit.png" height = "20" alt = "edit record" />&nbsp;&nbsp;edit</a></td>
+<tmpl_else>
+		<td><a href = "/records/?domain_id=<tmpl_var name = 'domain_id' />&type=soa"><img src = "/static/images/binoculars.png" height = "20" alt = "view record" />&nbsp;view</a></td>
+</tmpl_if>
+		<td></td>
+		<td><form action = "/delete_dns_domain/" method = "GET">
+		<input type = "hidden" name = "domain_id" value =
+			"<tmpl_var name = 'domain_id' />" />
+		<input type = "submit" class = "form_btn_red" value =
+			"delete" />
+		</form>
+		</td>
+	</tr>
+</tmpl_loop>
+	</tbody>
+	</table>
+<br />
+<a href = "/add_dns_domain/"><img src = "/static/images/add.png" width = "16" height = "16" alt = "add dns domain" /></a> <b>Add a DNS domain</b>
+
+<br />
+<br />
+
+<h2>Mail <small><span class = "lighter">(<tmpl_var name = "nr_mail" />)</span></small></h2>
+<p />
+
+	<table>
+	<tbody>
+	<tr>
+		<td><strong>Domain</strong></td>
+		<td><strong>Type</strong></td>
+		<td><strong>Added</strong></td>
+		<td><strong>Expires</strong></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td width = "20"></td>
+		<td></td>
+	</tr>
+<tmpl_loop name = "mail">
+<tmpl_if name = "zebra" value = "yes">
+	<tr class = "listzebra">
+<tmpl_else>
+	<tr>
+</tmpl_if>
+		<td><tmpl_var name = "domain" fmt = "de_xss" /></td>
+		<td><tmpl_if name = "type" value = "MX">Backup Mail Exchanger<tmpl_else>Mail Forwarding</tmpl_if></td>
+		<td><tmpl_var name = "added" fmt = "date" /></td>
+		<td class = "<tmpl_if name = 'exp' value = 'warn'>exp_warn<tmpl_elsif name = 'exp' value = 'expired'>exp_expired<tmpl_else></tmpl_if>"><tmpl_var name = "expires" fmt = "date" /></td>
+		<td></td>
+		<td><a href = "/renew/?domain_id=<tmpl_var name = 'domain_id' />&type=mail"><img src = "/static/images/refresh.png" height = "20" alt = "renew mail domain" />&nbsp;renew</a></td>
+		<td></td>
+<tmpl_if name = "exp" value = "expired">
+		<td></td>
+<tmpl_elsif name = "type" value = "MX">
+		<td><a href = "/backup_mx/?domain_id=<tmpl_var name = 'domain_id' />"><img src = "/static/images/binoculars.png" height = "20" alt = "view record" />&nbsp;view</a></td>
+<tmpl_else>
+		<td><a href = "/mail_forwarding/?domain_id=<tmpl_var name = 'domain_id' />"><img src = "/static/images/edit.png" height = "20" alt = "edit record" />&nbsp;&nbsp;edit</a></td>
+</tmpl_if>
+		<td></td>
+		<td><form action = "/delete_mail_domain/" method = "GET">
+		<input type = "hidden" name = "domain_id" value =
+			"<tmpl_var name = 'domain_id' />" />
+		<input type = "submit" class = "form_btn_red" value =
+			"delete" />
+		</form>
+		</td>
+	</tr>
+</tmpl_loop>
+	</tbody>
+	</table>
+<br />
+<a href = "/add_mail_domain/"><img src = "/static/images/add.png" width = "16" height = "16" alt = "add mail domain" /></a> <b>Add a Mail domain</b>
+
+</body>
+</html>

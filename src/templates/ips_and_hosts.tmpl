@@ -1,0 +1,97 @@
+<html>
+<head>
+	<title>DNSandMX : IPs and Hosts</title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "user_name">
+		<h3 style = "margin-top: 0px; margin-bottom: 2px">
+			<tmpl_var name = "banner_user" fmt = "de_xss" /></h3>
+		<span class = "lighter small">
+			Last login: <tmpl_var name = "last_login" /> (UTC) from 			<tmpl_var name = "last_login_from" fmt = "de_xss" />
+		</span>
+	</div>
+	<div class = "logo">
+		<img src = "/static/images/logo.png" alt = "logo" />
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+| <a href = "/logout/">Logout</a> | <span class = "lighter">IPs and Hosts</span> | <a href = "/settings/">Settings</a> | <a href = "/overview/">Overview</a> |
+<p />
+
+<h1>What you need to know</h1>
+
+<h2 class = "lighter">DNS</h2>
+<h4>Primary DNS Hosting</h4>
+
+Use the following host names for your domains name servers.
+<p />
+<big>
+ns1.dnsandmx.com<br />
+ns2.dnsandmx.com
+</big>
+<p />
+
+<h4>Secondary DNS hosting</h4>
+
+You will need to allow AXFRs from the following IP addresses.
+<p />
+<big>
+178.79.140.199<br />
+50.116.31.8
+</big>
+<p />
+
+You can also send notifies to the above addresses for expedient updates.
+Otherwise updates will happen as per the refresh interval as specified in the
+SOA record.
+<p />
+
+<h2 class = "lighter">Mail</h2>
+<h4>Backup Mail Exchanger</h4>
+
+Create a MX record under your domain using the host below as the MX server.
+<p />
+
+<big>
+mx2.dnsandmx.com
+</big>
+<p />
+
+Give this a lower priority than your existing mail server(s).
+<p />
+If you have an existing MX record e.g <i>mx1.mydomain.tld</i> with a
+priority of <i>10</i>, create another MX entry with <i>mx2.dnsandmx.com</i> with
+a priority of <i>20</i>
+<p />
+
+<h4>Mail Forwarding</h4>
+
+Create two MX entries under your domain using the hosts below.
+<p />
+
+<big>
+mx1.dnsandmx.com<br />
+mx2.dnsandmx.com
+</big>
+<p />
+
+Give them equal priority.
+<p />
+<br />
+
+<big>
+<span style =
+	"color: #647ba4;">DNS</span><span style =
+	"color: #828282;">and</span><span style =
+	"color: #647ba4;">MX</span> <a href = "http://<tmpl_var name =
+		'www_host' fmt = 'de_xss' />/support.html">support</a> page.
+</big>
+
+</body>
+</html>
