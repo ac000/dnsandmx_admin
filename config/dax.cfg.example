@@ -11,7 +11,6 @@ DB_PASS=
 DB_NAME=dnsandmx_admin
 MAIL_CMD=/usr/sbin/sendmail -t
 MAIL_FROM=noreply@example.com
-MAIL_REPLY_TO=andrew@example.com
 PAYPAL_BID=XXXXXXXXXXX
 PAYPAL_REC_EMAIL=seller@example.com
 PAYPAL_HOST=www.paypal.com

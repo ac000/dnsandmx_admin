@@ -72,8 +72,6 @@ int get_config(const char *filename)
 			mail_cmd = strdup(value);
 		else if (strcmp(option, "MAIL_FROM") == 0)
 			mail_from = strdup(value);
-		else if (strcmp(option, "MAIL_REPLY_TO") == 0)
-			mail_reply_to = strdup(value);
 		else if (strcmp(option, "LOG_DIR") == 0)
 			log_dir = strdup(value);
 		else if (strcmp(option, "NR_PROCS") == 0)

@@ -981,7 +981,6 @@ void send_reset_password_mail(const char *address, const char *key)
 {
 	FILE *fp = popen(MAIL_CMD, "w");
 
-	fprintf(fp, "Reply-To: %s\r\n", MAIL_REPLY_TO);
 	fprintf(fp, "From: %s\r\n", MAIL_FROM);
 	fprintf(fp, "Subject: DNSandMX Password Reset Request\r\n");
 	fprintf(fp, "To: %s\r\n", address);
@@ -1010,7 +1009,6 @@ void send_activation_mail(const char *address, const char *key)
 {
 	FILE *fp = popen(MAIL_CMD, "w");
 
-	fprintf(fp, "Reply-To: %s\r\n", MAIL_REPLY_TO);
 	fprintf(fp, "From: %s\r\n", MAIL_FROM);
 	fprintf(fp, "Subject: DNSandMX Account Activation\r\n");
 	fprintf(fp, "To: %s\r\n", address);
@@ -1041,7 +1039,6 @@ void send_expiry_mail(const char *name, const char *address,
 	FILE *fp = popen(MAIL_CMD, "w");
 	struct tm *tm = gmtime(&expires);
 
-	fprintf(fp, "Reply-To: %s\r\n", MAIL_REPLY_TO);
 	fprintf(fp, "From: %s\r\n", MAIL_FROM);
 	fprintf(fp, "Subject: Service Expiry Warning for %s\r\n", domain);
 	fprintf(fp, "To: %s <%s>\r\n", name, address);
@@ -1077,7 +1074,6 @@ void send_expired_mail(const char *name, const char *address,
 	FILE *fp = popen(MAIL_CMD, "w");
 	struct tm *tm = gmtime(&expires);
 
-	fprintf(fp, "Reply-To: %s\r\n", MAIL_REPLY_TO);
 	fprintf(fp, "From: %s\r\n", MAIL_FROM);
 	fprintf(fp, "Subject: Service Expiry Notification for %s\r\n", domain);
 	fprintf(fp, "To: %s <%s>\r\n", name, address);

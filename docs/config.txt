@@ -13,8 +13,6 @@ MAIL_CMD	The command used to send email e.g
 		/usr/sbin/sendmail -f noreply@example.com -t
 MAIL_FROM	The From address to use for email, e.g
 		noreply@example.com
-MAIL_REPLY_TO	The address to use the the Reply-to: header, e.g
-		noreply@example.com
 
 SESSION_DB	Path to the tokyocabinet sessions file, e.g
 		/dev/shm/application-www-sessions.tct

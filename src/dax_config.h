@@ -20,7 +20,6 @@ extern char *log_dir;
 
 char *mail_cmd;
 char *mail_from;
-char *mail_reply_to;
 
 char *app_host;
 char *www_host;
@@ -59,7 +58,6 @@ extern int debug_level;	/* Default debug level set in src/dax.c */
 
 #define MAIL_CMD	mail_cmd
 #define MAIL_FROM	mail_from
-#define MAIL_REPLY_TO	mail_reply_to
 
 #define APP_HOST	app_host
 #define WWW_HOST	www_host
