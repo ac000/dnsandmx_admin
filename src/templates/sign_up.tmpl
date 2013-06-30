@@ -21,6 +21,8 @@
 <h3 class = "lighter">Click <a href = "/forgotten_password/">here</a> if you have forgotten your password.</h3>
 <tmpl_elsif name = "no_email" value = "yes">
 <h2 class = "lighter">Please provide a valid email address.</h2>
+<tmpl_elsif name = "invalid_email" value = "yes">
+<h2 class = "hblue"><tmpl_var name = "email_addr" fmt = "de_xss" /> <span class = "lighter">Is NOT a valid email address.</span></h2>
 <tmpl_else>
 <h2 class = "lighter">An account activation email has been sent to <span class
 	= "hblue"><tmpl_var name = 'email_addr' fmt = 'de_xss' /></h2>

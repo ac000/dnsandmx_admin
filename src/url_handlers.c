@@ -3788,6 +3788,7 @@ static void overview(void)
 static void sign_up(void)
 {
 	char *email;
+	const char *email_addr;
 	char key[SHA1_LEN + 1];
 	TMPL_fmtlist *fmtlist = NULL;
 	TMPL_varlist *vl = NULL;
@@ -3795,17 +3796,24 @@ static void sign_up(void)
 	if (!IS_POST())
 		return;
 
-	if (!IS_SET(qvar("email_addr"))) {
+	email_addr = qvar("email_addr");
+
+	if (!IS_SET(email_addr)) {
 		vl = add_html_var(vl, "no_email", "yes");
 		goto out;
 	}
 
-	if (user_already_exists(qvar("email_addr"))) {
+	if (!is_valid_email_address(email_addr)) {
+		vl = add_html_var(vl, "invalid_email", "yes");
+		goto out;
+	}
+
+	if (user_already_exists(email_addr)) {
 		vl = add_html_var(vl, "user_exists", "yes");
 		goto out;
 	}
 
-	email = make_mysql_safe_string(qvar("email_addr"));
+	email = make_mysql_safe_string(email_addr);
 	generate_hash(key, SHA1);
 	sql_query(conn, "REPLACE INTO pending_activations VALUES "
 			"('%s', '%s', %ld)", email, key, time(NULL) + 86400);
@@ -3813,7 +3821,7 @@ static void sign_up(void)
 	free(email);
 
 out:
-	vl = add_html_var(vl, "email_addr", qvar("email_addr"));
+	vl = add_html_var(vl, "email_addr", email_addr);
 	vl = add_html_var(vl, "www_host", WWW_HOST);
 
 	fmtlist = TMPL_add_fmt(fmtlist, "de_xss", de_xss);
