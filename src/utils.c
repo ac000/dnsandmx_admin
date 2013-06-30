@@ -251,6 +251,17 @@ bool is_valid_hostname(const char *hostname)
 }
 
 /*
+ * A basic check for something that looks like a valid email address.
+ */
+bool is_valid_email_address(const char *email_addr)
+{
+	if (!strstr(email_addr, "@") || !strstr(email_addr, "."))
+		return false;
+	else
+		return true;
+}
+
+/*
  * Checks if a domain is editable. A domain is editable if it is the
  * users domain and is is NOT expired.
  */
