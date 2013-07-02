@@ -271,18 +271,25 @@ static void settings(void)
 	 * showing them.
 	 */
 	if (IS_POST() && valid_csrf_token()) {
-		if ((!IS_SET(qvar("dax_email1")) &&
-		     !IS_SET(qvar("dax_email2"))) ||
-		    (strcmp(qvar("dax_email1"), qvar("dax_email2")) != 0)) {
-			vl = add_html_var(vl, "email_error", "yes");
+		const char *email1 = qvar("dax_email1");
+		const char *email2 = qvar("dax_email2");
+
+		if (!is_valid_email_address(email1) &&
+		    !is_valid_email_address(email2)) {
+			vl = add_html_var(vl, "valid_email", "no");
 			form_err = true;
-		} else if (strcmp(user_session.username,
-					qvar("dax_email1")) != 0) {
-			if (user_already_exists(qvar("dax_email1"))) {
+		} else if (strcmp(email1, email2) != 0) {
+			vl = add_html_var(vl, "emails_match", "no");
+			form_err = true;
+		} else if (strcmp(user_session.username, email1) != 0) {
+			if (user_already_exists(email1)) {
 				vl = add_html_var(vl, "user_exists", "yes");
 				form_err = true;
 			}
 		}
+		if (form_err)
+			vl = add_html_var(vl, "email_error", "yes");
+
 		if (strlen(qvar("dax_pass1")) > 7 &&
 		    strlen(qvar("dax_pass2")) > 7) {
 			if (strcmp(qvar("dax_pass1"), qvar("dax_pass2")) != 0) {

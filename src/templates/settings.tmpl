@@ -52,7 +52,9 @@
 	<tr>
 	<td></td>
 	<td>
-		<tmpl_if name = "email_error">
+		<tmpl_if name = "valid_email" value = "no">
+			<big><span class = "t_red">Username should be your email address</span></big><br />
+		 <tmpl_elsif name = "emails_match" value = "no">
 			<big><span class = "t_red">Usernames do not match</span></big><br />
 		<tmpl_elsif name = "user_exists">
 			<big><span class = "t_red">Username already exists</span></big><br />
