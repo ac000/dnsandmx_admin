@@ -4339,7 +4339,7 @@ out2:
 	free_avars();
 	free_u_files();
 	clock_gettime(CLOCK_REALTIME, &etp);
-	d_fprintf(access_log, "Got request from %s for %s (%s), %ums\n",
+	d_fprintf(access_log, "%s %s (%s), %ums\n",
 				env_vars.remote_addr,
 				request_uri,
 				env_vars.request_method,
