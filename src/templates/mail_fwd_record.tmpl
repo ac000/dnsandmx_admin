@@ -62,7 +62,7 @@ Add a <span class = "hblue">mail forward</span> record to
 	</tr>
 	<tr>
 		<td>Destination</td>
-		<td><input type = "email" name = "dax_mfd"
+		<td><input type = "text" name = "dax_mfd"
 			value = "<tmpl_var name = 'dax_mfd'
 			fmt = 'de_xss' />"
 			size = "30" maxlength = "255" class =
@@ -72,7 +72,9 @@ Add a <span class = "hblue">mail forward</span> record to
                         " />
 		</td>
 		<td></td>
-		<td class = "lighter">Enter the destination email address</td>
+		<td class = "lighter">Enter the destination email address.
+			(Use the special entry <b>devnull</b> to have stuff
+			sent to a blackhole).</td>
 	</tr>
 </tbody>
 </table>
