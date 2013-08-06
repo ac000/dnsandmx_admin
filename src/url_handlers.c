@@ -3824,7 +3824,7 @@ static void sign_up(void)
 	generate_hash(key, SHA1);
 	sql_query(conn, "REPLACE INTO pending_activations VALUES "
 			"('%s', '%s', %ld)", email, key, time(NULL) + 86400);
-	send_activation_mail(qvar("email_addr"), key);
+	send_activation_mail(email_addr, key);
 	free(email);
 
 out:
