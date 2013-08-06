@@ -3795,7 +3795,7 @@ static void overview(void)
 static void sign_up(void)
 {
 	char *email;
-	const char *email_addr;
+	char *email_addr;
 	char key[SHA1_LEN + 1];
 	TMPL_fmtlist *fmtlist = NULL;
 	TMPL_varlist *vl = NULL;
@@ -3803,7 +3803,8 @@ static void sign_up(void)
 	if (!IS_POST())
 		return;
 
-	email_addr = qvar("email_addr");
+	email_addr = (char *)qvar("email_addr");
+	email_addr = g_strstrip(email_addr);
 
 	if (!IS_SET(email_addr)) {
 		vl = add_html_var(vl, "no_email", "yes");
