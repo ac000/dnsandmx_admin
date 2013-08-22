@@ -23,6 +23,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <stdbool.h>
+#include <setjmp.h>
 
 #include <mhash.h>
 
@@ -3264,10 +3265,11 @@ out2:
 	free(dst);
 }
 
+static char post_buf[BUF_SIZE];
 /*
  * /paypal_ipn/
  */
-static void paypal_ipn(const char *pbuf)
+static void paypal_ipn(void)
 {
 	FILE *response;
 	MYSQL_RES *res;
@@ -3288,7 +3290,7 @@ static void paypal_ipn(const char *pbuf)
 	struct timespec tp;
 
 	/* Is the request likely to be from PayPal? */
-	if (!strstr(pbuf, "txn_id"))
+	if (!strstr(post_buf, "txn_id"))
 		return;
 
 	/* Check our email address to catch spoofs */
@@ -3297,7 +3299,7 @@ static void paypal_ipn(const char *pbuf)
 
 	snprintf(url, sizeof(url),
 			"https://%s/cgi-bin/webscr?cmd=_notify-validate&%s",
-			PAYPAL_HOST, pbuf);
+			PAYPAL_HOST, post_buf);
 	response = fmemopen(rbuf, sizeof(rbuf) - 1, "w");
 
 	curl = curl_easy_init();
@@ -4094,16 +4096,30 @@ static bool match_uri(const char *request_uri, const char *match)
 		return false;
 }
 
+static jmp_buf env;
+static char *request_uri;
+/*
+ * This is the main URI mapping/routing function.
+ *
+ * Takes a URI string to match and the function to run if it matches
+ * request_uri.
+ */
+static inline void uri_map(const char *uri, void (uri_handler)(void))
+{
+	if (match_uri(request_uri, uri)) {
+		uri_handler();
+		longjmp(env, 1);
+	}
+}
+
 /*
  * Main application. This is where the requests come in and routed.
  */
 void handle_request(void)
 {
 	bool logged_in = false;
-	char *request_uri;
 	struct timespec stp;
 	struct timespec etp;
-	char buf[BUF_SIZE] = "\0";
 
 	clock_gettime(CLOCK_REALTIME, &stp);
 
@@ -4119,44 +4135,29 @@ void handle_request(void)
 	 * data exactly was we received it for verification.
 	 */
 	if (strstr(env_vars.content_type, "x-www-form-urlencoded")) {
-		memset(buf, 0, sizeof(buf));
-		fcgx_gs(buf, sizeof(buf) - 1);
+		memset(post_buf, 0, sizeof(post_buf));
+		fcgx_gs(post_buf, sizeof(post_buf) - 1);
 	}
-	set_vars(buf);
+	set_vars(post_buf);
 
 	/* Initialise the database connection for the master name server */
 	conn = db_conn(db_host, db_name, false);
 	if (!conn)
 		goto out2;
 
+	/* Return from non-authenticated URIs and goto 'out2' */
+	if (setjmp(env))
+		goto out2;
+
 	/*
 	 * Some routes need to come before the login / session stuff as
 	 * they can't be logged in and have no session.
 	 */
-	if (URI("/paypal_ipn/")) {
-		paypal_ipn(buf);
-		goto out2;
-	}
-
-	if (URI("/sign_up/")) {
-		sign_up();
-		goto out2;
-	}
-
-	if (URI("/activate_account/")) {
-		activate_account();
-		goto out2;
-	}
-
-	if (URI("/reset_password/")) {
-		reset_password();
-		goto out2;
-	}
-
-	if (URI("/login/")) {
-		login();
-		goto out2;
-	}
+	uri_map("/paypal_ipn/", paypal_ipn);
+	uri_map("/sign_up/", sign_up);
+	uri_map("/activate_account/", activate_account);
+	uri_map("/reset_password/", reset_password);
+	uri_map("/login/", login);
 
 	logged_in = is_logged_in();
 	if (!logged_in) {
@@ -4167,167 +4168,43 @@ void handle_request(void)
 	/* Logged in, set-up the user_session structure */
 	set_user_session();
 
+	/* Return from authenticated URIs and goto 'out' */
+	if (setjmp(env))
+		goto out;
+
 	/* Add new url handlers after here */
-
-	if (URI("/settings/")) {
-		settings();
-		goto out;
-	}
-
-	if (URI("/overview/")) {
-		overview();
-		goto out;
-	}
-
-	if (URI("/transactions/")) {
-		transactions();
-		goto out;
-	}
-
-	if (URI("/records/")) {
-		records();
-		goto out;
-	}
-
-	if (URI("/soa_record/")) {
-		soa_record();
-		goto out;
-	}
-
-	if (URI("/master_ns_ip/")) {
-		master_ns_ip();
-		goto out;
-	}
-
-	if (URI("/ns_record/")) {
-		ns_record();
-		goto out;
-	}
-
-	if (URI("/a_record/")) {
-		a_record();
-		goto out;
-	}
-
-	if (URI("/aaaa_record/")) {
-		aaaa_record();
-		goto out;
-	}
-
-	if (URI("/cname_record/")) {
-		cname_record();
-		goto out;
-	}
-
-	if (URI("/loc_record/")) {
-		loc_record();
-		goto out;
-	}
-
-	if (URI("/mx_record/")) {
-		mx_record();
-		goto out;
-	}
-
-	if (URI("/naptr_record/")) {
-		naptr_record();
-		goto out;
-	}
-
-	if (URI("/ptr_record/")) {
-		ptr_record();
-		goto out;
-	}
-
-	if (URI("/rp_record/")) {
-		rp_record();
-		goto out;
-	}
-
-	if (URI("/spf_record/")) {
-		spf_record();
-		goto out;
-	}
-
-	if (URI("/srv_record/")) {
-		srv_record();
-		goto out;
-	}
-
-	if (URI("/txt_record/")) {
-		txt_record();
-		goto out;
-	}
-
-	if (URI("/delete_dns_record/")) {
-		delete_dns_record();
-		goto out;
-	}
-
-	if (URI("/delete_dns_domain/")) {
-		delete_dns_domain();
-		goto out;
-	}
-
-	if (URI("/delete_mail_domain/")) {
-		delete_mail_domain();
-		goto out;
-	}
-
-	if (URI("/delete_mail_fwd_record/")) {
-		delete_mail_fwd_record();
-		goto out;
-	}
-
-	if (URI("/add_dns_domain/")) {
-		add_dns_domain();
-		goto out;
-	}
-
-	if (URI("/add_mail_domain/")) {
-		add_mail_domain();
-		goto out;
-	}
-
-	if (URI("/mail_forwarding/")) {
-		mail_forwarding();
-		goto out;
-	}
-
-	if (URI("/mail_fwd_record/")) {
-		mail_fwd_record();
-		goto out;
-	}
-
-	if (URI("/backup_mx/")) {
-		backup_mx();
-		goto out;
-	}
-
-	if (URI("/issue_etrn/")) {
-		issue_etrn();
-		goto out;
-	}
-
-	if (URI("/add_funds/")) {
-		add_funds();
-		goto out;
-	}
-
-	if (URI("/renew/")) {
-		renew();
-		goto out;
-	}
-
-	if (URI("/logout/")) {
-		logout();
-		goto out;
-	}
-
-	if (URI("/ips_and_hosts/")) {
-		ips_and_hosts();
-		goto out;
-	}
+	uri_map("/overview/", overview);
+	uri_map("/settings/", settings);
+	uri_map("/transactions/", transactions);
+	uri_map("/records/", records);
+	uri_map("/soa_record/", soa_record);
+	uri_map("/master_ns_ip/", master_ns_ip);
+	uri_map("/ns_record/", ns_record);
+	uri_map("/a_record/", a_record);
+	uri_map("/aaaa_record/", aaaa_record);
+	uri_map("/cname_record/", cname_record);
+	uri_map("/loc_record/", loc_record);
+	uri_map("/mx_record/", mx_record);
+	uri_map("/naptr_record/", naptr_record);
+	uri_map("/ptr_record/", ptr_record);
+	uri_map("/rp_record/", rp_record);
+	uri_map("/spf_record/", spf_record);
+	uri_map("/srv_record/", srv_record);
+	uri_map("/txt_record/", txt_record);
+	uri_map("/delete_dns_record/", delete_dns_record);
+	uri_map("/delete_dns_domain/", delete_dns_domain);
+	uri_map("/delete_mail_domain/", delete_mail_domain);
+	uri_map("/delete_mail_fwd_record/", delete_mail_fwd_record);
+	uri_map("/add_dns_domain/", add_dns_domain);
+	uri_map("/add_mail_domain/", add_mail_domain);
+	uri_map("/mail_forwarding/", mail_forwarding);
+	uri_map("/mail_fwd_record/", mail_fwd_record);
+	uri_map("/backup_mx/", backup_mx);
+	uri_map("/issue_etrn/", issue_etrn);
+	uri_map("/add_funds/", add_funds);
+	uri_map("/renew/", renew);
+	uri_map("/ips_and_hosts/", ips_and_hosts);
+	uri_map("/logout/", logout);
 
 	/* Default location */
 	fcgx_p("Location: /login/\r\n\r\n");
