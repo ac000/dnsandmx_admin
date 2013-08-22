@@ -4129,8 +4129,10 @@ void handle_request(void)
 	request_uri = strdupa(env_vars.request_uri);
 	/*
 	 * If we get POST data, we need to make a copy of it incase it is
-	 * from PayPal's IPN service. It requires us to send back the post
-	 * data exactly was we received it for verification.
+	 * from PayPal's IPN service. We need to acquire the post buffer
+	 * here otherwise it will be eaten in set_vars() and won't be
+	 * available for paypal_ipn() which requires us to send back the
+	 * post data exactly as we received it for verification.
 	 */
 	if (strstr(env_vars.content_type, "x-www-form-urlencoded")) {
 		memset(post_buf, 0, sizeof(post_buf));
