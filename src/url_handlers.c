@@ -39,8 +39,6 @@
 #include "audit.h"
 #include "csrf.h"
 
-#define URI(uri)	match_uri(request_uri, uri)
-
 struct dom_rec_ent {
 	const char *domain;
 	const char *name;
