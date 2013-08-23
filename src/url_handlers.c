@@ -495,6 +495,7 @@ static void delete_mail_domain(void)
 			domain_id);
 	if (mysql_num_rows(res) == 0)
 		goto out;
+	mysql_free_result(res);
 
 	res = sql_query(conn, "SELECT domain, type FROM mail_domains WHERE "
 				"domain_id = %d", domain_id);
