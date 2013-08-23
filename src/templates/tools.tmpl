@@ -1,0 +1,64 @@
+<html>
+<head>
+	<title>DNSandMX : Tools</title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "user_name">
+		<h3 style = "margin-top: 0px; margin-bottom: 2px">
+			<tmpl_var name = "banner_user" fmt = "de_xss" /></h3>
+		<span class = "lighter small">
+			Last login: <tmpl_var name = "last_login" /> (UTC) from 			<tmpl_var name = "last_login_from" fmt = "de_xss" />
+		</span>
+	</div>
+	<div class = "logo">
+		<img src = "/static/images/logo.png" alt = "logo" />
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+| <a href = "/logout/">Logout</a> | <a href = "/ips_and_hosts/">IPs and Hosts</a> | <a href = "/settings/">Settings</a> | <span class = "lighter">Tools</span> | <a href = "/overview/">Overview</a> |
+<p />
+
+<center>
+<h2 class = "lighter">Extract a DNS domain</h2>
+
+<form action = "/tools/" method = "POST">
+
+<table>
+<tbody>
+<tr>
+	<td>
+		<select name = "domain">
+		<option value = "-1">Select Domain</option>
+<tmpl_loop name = "domains">
+		<option value = "<tmpl_var name = 'id' />"><tmpl_var name =
+			"domain" fmt = "de_xss" /></option>
+</tmpl_loop>
+		</select>
+	</td>
+	<td>
+		<select name = "format">
+		<option value = "-1">Select Format</option>
+		<option value = "bind">BIND Zone File</option>
+		</select>
+	</td>
+	<td>
+		<input type = "hidden" name = "csrf_token" value =
+			"<tmpl_var name = 'csrf_token' />" />
+		<input type = "hidden" name = "extract_dns" value = "1" />
+		<input type = "submit" value = "Download">
+	</td>
+</tr>
+</tbody>
+</table>
+
+</form>
+</center>
+
+</body>
+</html>

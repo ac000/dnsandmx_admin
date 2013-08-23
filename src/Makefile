@@ -4,7 +4,7 @@ LDFLAGS=-Wl,-z,now -pie
 LIBS=-L./libctemplate `pkg-config --libs glib-2.0` `pkg-config --libs gmime-2.0` `mysql_config --libs` -lm -lrt -lcrypt -lcurl -lfcgi -lmhash -ltokyocabinet -lctemplate-fcgx
 INCS=-I./libctemplate `pkg-config --cflags glib-2.0` `pkg-config --cflags gmime-2.0` `mysql_config --cflags`
 
-objects = dax.o get_config.o url_handlers.o utils.o db.o audit.o csrf.o
+objects = dax.o get_config.o url_handlers.o tools.o utils.o db.o audit.o csrf.o
 
 dax: $(objects)
 	@echo -e "  LNK\t$@"
@@ -14,9 +14,13 @@ dax.o: common.h get_config.h dax_config.h url_handlers.h dax.h dax.c db.h
 	@echo -e "  CC\t$@"
 	@$(CC) $(CFLAGS) -c dax.c ${INCS}
 
-url_handlers.o: common.h utils.h audit.h url_handlers.c
+url_handlers.o: common.h utils.h audit.h csrf.h tools.h url_handlers.c
 	@echo -e "  CC\t$@"
 	@$(CC) $(CFLAGS) -c url_handlers.c ${INCS}
+
+tools.o: common.h tools.h tools.c
+	@echo -e "  CC\t$@"
+	@$(CC) $(CFLAGS) -c tools.c ${INCS}
 
 utils.o: common.h utils.h utils.c
 	@echo -e "  CC\t$@"

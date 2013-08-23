@@ -36,6 +36,7 @@
 
 #include "common.h"
 #include "utils.h"
+#include "tools.h"
 #include "audit.h"
 #include "csrf.h"
 
@@ -4043,6 +4044,49 @@ out:
 	free(email);
 }
 
+static void tools(void)
+{
+	unsigned long nr_rows;
+	unsigned long i;
+	MYSQL_RES *res;
+	TMPL_varlist *ml = NULL;
+	TMPL_loop *domains = NULL;
+	TMPL_fmtlist *fmtlist = NULL;
+
+	if (IS_POST() && valid_csrf_token()) {
+		int domain_id = atoi(qvar("domain"));
+
+		dump_dns_domain_to_bind(domain_id);
+		return;
+	}
+
+	res = sql_query(conn, "SELECT domain_id, name FROM domains INNER JOIN "
+			"pdns.domains ON (domains.domain_id = "
+			"pdns.domains.id) WHERE uid = %u ORDER BY name",
+			user_session.uid);
+
+	nr_rows = mysql_num_rows(res);
+	for (i = 0; i < nr_rows; i++) {
+		TMPL_varlist *vl = NULL;
+		GHashTable *db_row = NULL;
+
+		db_row = get_dbrow(res);
+		vl = add_html_var(vl, "id", get_var(db_row, "domain_id"));
+		vl = add_html_var(vl, "domain", get_var(db_row, "name"));
+
+		domains = TMPL_add_varlist(domains, vl);
+		free_vars(db_row);
+	}
+	ml = TMPL_add_loop(ml, "domains", domains);
+
+	add_csrf_token(ml);
+	fmtlist = TMPL_add_fmt(fmtlist, "de_xss", de_xss);
+	send_template("templates/tools.tmpl", ml, fmtlist);
+	TMPL_free_fmtlist(fmtlist);
+	TMPL_free_varlist(ml);
+	mysql_free_result(res);
+}
+
 /*
  * /ips_and_hosts/
  *
@@ -4206,6 +4250,7 @@ void handle_request(void)
 	uri_map("/add_funds/", add_funds);
 	uri_map("/renew/", renew);
 	uri_map("/ips_and_hosts/", ips_and_hosts);
+	uri_map("/tools/", tools);
 	uri_map("/logout/", logout);
 
 	/* Default location */
