@@ -859,6 +859,7 @@ static void delete_dns_domain(void)
 			"AND domain_id = %d", user_session.uid, domain_id);
 	if (mysql_num_rows(res) == 0)
 		goto out;
+	mysql_free_result(res);
 
 	res = sql_query(conn, "SELECT pdns.domains.name AS domain FROM "
 			"pdns.domains WHERE pdns.domains.id = %d",
