@@ -12,5 +12,6 @@
 #define _TOOLS_H_
 
 void dump_dns_domain_to_bind(int domain_id);
+void dump_dns_domain_to_csv(int domain_id);
 
 #endif /* _TOOLS_H_ */

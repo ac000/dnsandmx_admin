@@ -131,3 +131,103 @@ void dump_dns_domain_to_bind(int domain_id)
 out:
 	mysql_free_result(res);
 }
+
+void dump_dns_domain_to_csv(int domain_id)
+{
+	unsigned long i;
+	unsigned long nr_rows;
+	size_t size;
+	FILE *out;
+	MYSQL_RES *res;
+	MYSQL_ROW row;
+	GHashTable *db_row = NULL;
+	gchar **soa_bits;
+	char *ptr;
+	char *domain;
+	const char *csv_fmt = "%s\t%s\t%s\t%s\t%s\t%s\n";
+
+	res = sql_query(conn, "SELECT domain_id FROM domains WHERE uid = %d "
+			"AND domain_id = %d", user_session.uid, domain_id);
+	if (mysql_num_rows(res) == 0) {
+		fcgx_p("Location: /tools/\r\n\r\n");
+		goto out;
+	}
+	mysql_free_result(res);
+
+	res = sql_query(conn, "SELECT name FROM pdns.domains WHERE id = %d",
+			domain_id);
+	row = mysql_fetch_row(res);
+	domain = strdupa(row[0]);
+	mysql_free_result(res);
+
+	out = open_memstream(&ptr, &size);
+	res = sql_query(conn, "SELECT TRIM(LEADING '!!' FROM name) AS name, "
+			"type, content, ttl, IF(prio, prio, '') AS prio, "
+			"change_date FROM pdns.records WHERE domain_id = %d",
+			domain_id);
+	/* Print a header line */
+	fprintf(out, "name\ttype\tcontent\tttl\tprio\tmodified\n");
+
+	/* Create the SOA line */
+	db_row = get_dbrow(res);
+	soa_bits = g_strsplit(get_var(db_row, "content"), " ", 0);
+	fprintf(out, "%s\t%s\t%s %s ", get_var(db_row, "name"), get_var(db_row,
+				"type"), soa_bits[0], soa_bits[1]);
+	if (strcmp(soa_bits[2], "0") == 0) {
+		/*
+		 * PowerDNS uses a serial of 0 in the SOA record for
+		 * domains it's the primary server for and instead
+		 * uses the change_date field of the records table as
+		 * a serial.
+		 *
+		 * Convert this into the format YYYYMMDDNN
+		 */
+		time_t t = strtoll(get_var(db_row, "change_date"), NULL, 10);
+		struct tm *tm = gmtime(&t);
+
+		fprintf(out, "%04d%02d%02d00 ", tm->tm_year + 1900,
+				tm->tm_mon + 1, tm->tm_mday);
+	} else {
+		fprintf(out, "%s ", soa_bits[2]);
+	}
+	fprintf(out, "%s %s %s %s\t%s\t%s\t%s\n", soa_bits[3], soa_bits[4],
+			soa_bits[5], soa_bits[6], get_var(db_row, "ttl"),
+			get_var(db_row, "prio"), get_var(db_row,
+				"change_date"));
+	g_strfreev(soa_bits);
+	free_vars(db_row);
+
+	nr_rows = mysql_num_rows(res);
+	for (i = 1; i < nr_rows; i++) {
+		const char *name;
+		const char *type;
+		const char *content;
+		const char *ttl;
+		const char *prio;
+		const char *mtime;
+
+		db_row = get_dbrow(res);
+		name = get_var(db_row, "name");
+		type = get_var(db_row, "type");
+		content = get_var(db_row, "content");
+		ttl = get_var(db_row, "ttl");
+		prio = get_var(db_row, "prio");
+		mtime = get_var(db_row, "change_date");
+
+		fprintf(out, csv_fmt, name, type, content, ttl, prio, mtime);
+		free_vars(db_row);
+	}
+	fclose(out);
+
+	fcgx_p("Content-Type: text/plain\r\n");
+	fcgx_p("Content-Length: %ld\r\n", size);
+	fcgx_p("Content-Disposition: attachment; filename = %s.csv\r\n",
+			domain);
+	fcgx_p("\r\n");
+	fcgx_p("%s", ptr);
+
+	free(ptr);
+
+out:
+	mysql_free_result(res);
+}

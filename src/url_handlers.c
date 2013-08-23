@@ -4056,7 +4056,10 @@ static void tools(void)
 	if (IS_POST() && valid_csrf_token()) {
 		int domain_id = atoi(qvar("domain"));
 
-		dump_dns_domain_to_bind(domain_id);
+		if (strcmp(qvar("format"), "bind") == 0)
+			dump_dns_domain_to_bind(domain_id);
+		else if (strcmp(qvar("format"), "csv") == 0)
+			dump_dns_domain_to_csv(domain_id);
 		return;
 	}
 
