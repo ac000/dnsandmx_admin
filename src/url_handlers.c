@@ -4056,6 +4056,10 @@ static void tools(void)
 	if (IS_GET() && IS_SET(qvar("extract_dns"))) {
 		int domain_id = atoi(qvar("domain"));
 
+		if (domain_id == -1 || strcmp(qvar("format"), "-1") == 0) {
+			fcgx_p("Location: /tools/\r\n\r\n");
+			return;
+		}
 		if (strcmp(qvar("format"), "bind") == 0)
 			dump_dns_domain_to_bind(domain_id);
 		else if (strcmp(qvar("format"), "csv") == 0)
