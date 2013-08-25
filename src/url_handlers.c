@@ -4053,7 +4053,7 @@ static void tools(void)
 	TMPL_loop *domains = NULL;
 	TMPL_fmtlist *fmtlist = NULL;
 
-	if (IS_POST() && valid_csrf_token()) {
+	if (IS_GET() && valid_csrf_token()) {
 		int domain_id = atoi(qvar("domain"));
 
 		if (strcmp(qvar("format"), "bind") == 0)
