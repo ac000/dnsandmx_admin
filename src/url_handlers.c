@@ -4053,7 +4053,7 @@ static void tools(void)
 	TMPL_loop *domains = NULL;
 	TMPL_fmtlist *fmtlist = NULL;
 
-	if (IS_GET() && valid_csrf_token()) {
+	if (IS_GET() && IS_SET(qvar("extract_dns"))) {
 		int domain_id = atoi(qvar("domain"));
 
 		if (strcmp(qvar("format"), "bind") == 0)
@@ -4082,7 +4082,6 @@ static void tools(void)
 	}
 	ml = TMPL_add_loop(ml, "domains", domains);
 
-	add_csrf_token(ml);
 	fmtlist = TMPL_add_fmt(fmtlist, "de_xss", de_xss);
 	send_template("templates/tools.tmpl", ml, fmtlist);
 	TMPL_free_fmtlist(fmtlist);
