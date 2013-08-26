@@ -492,7 +492,7 @@ static void delete_mail_domain(void)
 	domain_id = atoi(qvar("domain_id"));
 
 	res = sql_query(conn, "SELECT domain_id FROM mail_domains WHERE "
-			"uid = %d AND domain_id = %d", user_session.uid,
+			"uid = %u AND domain_id = %d", user_session.uid,
 			domain_id);
 	if (mysql_num_rows(res) == 0)
 		goto out;
@@ -568,7 +568,7 @@ static void delete_mail_fwd_record(void)
 		goto out2;
 
 	res = sql_query(conn, "SELECT domain_id FROM mail_domains WHERE "
-			"uid = %d AND domain_id = %d", user_session.uid,
+			"uid = %u AND domain_id = %d", user_session.uid,
 			domain_id);
 	if (mysql_num_rows(res) == 0)
 		goto out;
@@ -606,7 +606,7 @@ static void issue_etrn(void)
 		goto out3;
 
 	mres = sql_query(conn, "SELECT domain_id FROM mail_domains WHERE "
-			"uid = %d AND domain_id = %d", user_session.uid,
+			"uid = %u AND domain_id = %d", user_session.uid,
 			domain_id);
 	if (mysql_num_rows(mres) == 0)
 		goto out2;
@@ -857,7 +857,7 @@ static void delete_dns_domain(void)
 
 	domain_id = atoi(qvar("domain_id"));
 
-	res = sql_query(conn, "SELECT domain_id FROM domains WHERE uid = %d "
+	res = sql_query(conn, "SELECT domain_id FROM domains WHERE uid = %u "
 			"AND domain_id = %d", user_session.uid, domain_id);
 	if (mysql_num_rows(res) == 0)
 		goto out;
@@ -923,7 +923,7 @@ static void delete_dns_record(void)
 	if (!valid_csrf_token())
 		goto out2;
 
-	res = sql_query(conn, "SELECT domain_id FROM domains WHERE uid = %d "
+	res = sql_query(conn, "SELECT domain_id FROM domains WHERE uid = %u "
 			"AND domain_id = %d", user_session.uid, domain_id);
 	if (mysql_num_rows(res) == 0)
 		goto out;
@@ -3449,7 +3449,7 @@ static void renew(void)
 		return;
 
 	domain_id = atoi(qvar("domain_id"));
-	res = sql_query(conn, "SELECT domain_id FROM %s WHERE uid = %d AND "
+	res = sql_query(conn, "SELECT domain_id FROM %s WHERE uid = %u AND "
 			"domain_id = %d", dtable, user_session.uid,
 			domain_id);
 	nr_rows = mysql_num_rows(res);
@@ -3666,7 +3666,7 @@ static void overview(void)
 	TMPL_fmtlist *fmtlist = NULL;
 	char nr_rec[11];
 
-	res = sql_query(conn, "SELECT amount FROM balances WHERE uid = %d",
+	res = sql_query(conn, "SELECT amount FROM balances WHERE uid = %u",
 			user_session.uid);
 	row = mysql_fetch_row(res);
 	ml = add_html_var(ml, "funds", row[0]);

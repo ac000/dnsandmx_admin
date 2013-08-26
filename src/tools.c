@@ -32,7 +32,7 @@ void dump_dns_domain_to_bind(int domain_id)
 	char *domain;
 	const char *def_ttl;
 
-	res = sql_query(conn, "SELECT domain_id FROM domains WHERE uid = %d "
+	res = sql_query(conn, "SELECT domain_id FROM domains WHERE uid = %u "
 			"AND domain_id = %d", user_session.uid, domain_id);
 	if (mysql_num_rows(res) == 0) {
 		fcgx_p("Location: /tools/\r\n\r\n");
@@ -146,7 +146,7 @@ void dump_dns_domain_to_csv(int domain_id)
 	char *domain;
 	const char *csv_fmt = "%s\t%s\t%s\t%s\t%s\t%s\n";
 
-	res = sql_query(conn, "SELECT domain_id FROM domains WHERE uid = %d "
+	res = sql_query(conn, "SELECT domain_id FROM domains WHERE uid = %u "
 			"AND domain_id = %d", user_session.uid, domain_id);
 	if (mysql_num_rows(res) == 0) {
 		fcgx_p("Location: /tools/\r\n\r\n");
