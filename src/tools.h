@@ -13,5 +13,6 @@
 
 void dump_dns_domain_to_bind(int domain_id);
 void dump_dns_domain_to_csv(int domain_id);
+void dump_mail_fwd_to_csv(int domain_id);
 
 #endif /* _TOOLS_H_ */

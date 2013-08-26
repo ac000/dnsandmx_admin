@@ -4051,22 +4051,29 @@ static void tools(void)
 	MYSQL_RES *res;
 	TMPL_varlist *ml = NULL;
 	TMPL_loop *domains = NULL;
+	TMPL_loop *mail_fwd = NULL;
 	TMPL_fmtlist *fmtlist = NULL;
 
-	if (IS_GET() && IS_SET(qvar("extract_dns"))) {
+	if (IS_GET() && IS_SET(env_vars.query_string)) {
 		int domain_id = atoi(qvar("domain"));
 
 		if (domain_id == -1 || strcmp(qvar("format"), "-1") == 0) {
 			fcgx_p("Location: /tools/\r\n\r\n");
 			return;
 		}
-		if (strcmp(qvar("format"), "bind") == 0)
-			dump_dns_domain_to_bind(domain_id);
-		else if (strcmp(qvar("format"), "csv") == 0)
-			dump_dns_domain_to_csv(domain_id);
+		if (IS_SET(qvar("extract_dns"))) {
+			if (strcmp(qvar("format"), "bind") == 0)
+				dump_dns_domain_to_bind(domain_id);
+			else if (strcmp(qvar("format"), "csv") == 0)
+				dump_dns_domain_to_csv(domain_id);
+		} else if (IS_SET(qvar("extract_mail_fwd"))) {
+			if (strcmp(qvar("format"), "csv") == 0)
+				dump_mail_fwd_to_csv(domain_id);
+		}
 		return;
 	}
 
+	/* Get A list of DNS domains */
 	res = sql_query(conn, "SELECT domain_id, name FROM domains INNER JOIN "
 			"pdns.domains ON (domains.domain_id = "
 			"pdns.domains.id) WHERE uid = %u ORDER BY name",
@@ -4085,12 +4092,32 @@ static void tools(void)
 		free_vars(db_row);
 	}
 	ml = TMPL_add_loop(ml, "domains", domains);
+	mysql_free_result(res);
+
+	/* Get a list mail forwarding domains */
+	res = sql_query(conn, "SELECT domain_id, domain FROM mail_domains "
+			"WHERE uid = %u AND type = 'FWD' ORDER BY domain",
+			user_session.uid);
+
+	nr_rows = mysql_num_rows(res);
+	for (i = 0; i < nr_rows; i++) {
+		TMPL_varlist *vl = NULL;
+		GHashTable *db_row = NULL;
+
+		db_row = get_dbrow(res);
+		vl = add_html_var(vl, "id", get_var(db_row, "domain_id"));
+		vl = add_html_var(vl, "domain", get_var(db_row, "domain"));
+
+		mail_fwd = TMPL_add_varlist(mail_fwd, vl);
+		free_vars(db_row);
+	}
+	ml = TMPL_add_loop(ml, "mail_fwd", mail_fwd);
+	mysql_free_result(res);
 
 	fmtlist = TMPL_add_fmt(fmtlist, "de_xss", de_xss);
 	send_template("templates/tools.tmpl", ml, fmtlist);
 	TMPL_free_fmtlist(fmtlist);
 	TMPL_free_varlist(ml);
-	mysql_free_result(res);
 }
 
 /*

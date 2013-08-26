@@ -57,6 +57,41 @@
 </table>
 
 </form>
+
+<br />
+
+<h2 class = "lighter">Export mail forwarding rules</h2>
+
+<form action = "/tools/" method = "GET">
+
+<table>
+<tbody>
+<tr>
+	<td>
+		<select name = "domain">
+		<option value = "-1">Select Domain</option>
+<tmpl_loop name = "mail_fwd">
+		<option value = "<tmpl_var name = 'id' />"><tmpl_var name =
+			"domain" fmt = "de_xss" /></option>
+</tmpl_loop>
+		</select>
+	</td>
+	<td>
+		<select name = "format">
+		<option value = "-1">Select Format</option>
+		<option value = "csv">CSV (TAB delimited)</option>
+		</select>
+	</td>
+	<td>
+		<input type = "hidden" name = "extract_mail_fwd" value = "1" />
+		<input type = "submit" value = "Download">
+	</td>
+</tr>
+</tbody>
+</table>
+
+</form>
+
 </center>
 
 </body>

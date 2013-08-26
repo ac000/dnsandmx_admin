@@ -231,3 +231,64 @@ void dump_dns_domain_to_csv(int domain_id)
 out:
 	mysql_free_result(res);
 }
+
+void dump_mail_fwd_to_csv(int domain_id)
+{
+	unsigned long i;
+	unsigned long nr_rows;
+	size_t size;
+	FILE *out;
+	MYSQL_RES *res;
+	MYSQL_ROW row;
+	GHashTable *db_row = NULL;
+	char *ptr;
+	char *domain;
+
+	res = sql_query(conn, "SELECT domain_id FROM mail_domains WHERE uid = "
+			"%u AND domain_id = %d AND type = 'FWD'",
+			user_session.uid, domain_id);
+	if (mysql_num_rows(res) == 0) {
+		fcgx_p("Location: /tools/\r\n\r\n");
+		goto out;
+	}
+	mysql_free_result(res);
+
+	res = sql_query(conn, "SELECT domain FROM mail_domains WHERE "
+			"domain_id = %d", domain_id);
+	row = mysql_fetch_row(res);
+	domain = strdupa(row[0]);
+	mysql_free_result(res);
+
+	out = open_memstream(&ptr, &size);
+	res = sql_query(conn, "SELECT source, destination FROM "
+			"postfix.forwarding WHERE domain_id = %d", domain_id);
+	/* Print a header line */
+	fprintf(out, "source\tdestination\n");
+
+	nr_rows = mysql_num_rows(res);
+	for (i = 0; i < nr_rows; i++) {
+		const char *source;
+		const char *destination;
+		const char *csv_fmt = "%s\t%s\n";
+
+		db_row = get_dbrow(res);
+		source = get_var(db_row, "source");
+		destination = get_var(db_row, "destination");
+
+		fprintf(out, csv_fmt, source, destination);
+		free_vars(db_row);
+	}
+	fclose(out);
+
+	fcgx_p("Content-Type: text/plain\r\n");
+	fcgx_p("Content-Length: %ld\r\n", size);
+	fcgx_p("Content-Disposition: attachment; filename = %s.csv\r\n",
+			domain);
+	fcgx_p("\r\n");
+	fcgx_p("%s", ptr);
+
+	free(ptr);
+
+out:
+	mysql_free_result(res);
+}
