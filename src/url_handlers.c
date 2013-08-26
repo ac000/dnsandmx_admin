@@ -3325,7 +3325,7 @@ static void paypal_ipn(void)
 	if (strcasestr(rbuf, "INVALID"))
 		return;
 
-	uid = atoi(qvar("custom"));
+	uid = strtoul(qvar("custom"), NULL, 10);
 	txn_id = make_mysql_safe_string(qvar("txn_id"));
 	txn_st = make_mysql_safe_string(qvar("payment_status"));
 	paypal_addr = make_mysql_safe_string(qvar("payer_email"));
@@ -3898,7 +3898,7 @@ static void activate_account(void)
 					"MAX(uid) IS NULL, 1000, "
 					"MAX(uid) + 1) FROM passwd");
 			row = mysql_fetch_row(res);
-			uid = atoi(row[0]);
+			uid = strtoul(row[0], NULL, 10);
 			mysql_free_result(res);
 
 			password = generate_password_hash(SHA512,
