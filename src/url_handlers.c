@@ -3411,7 +3411,6 @@ static void renew(void)
 	char funds[10];
 	char nexpire[11];
 	double amount;
-	time_t expires;
 	time_t n_expires;
 	GHashTable *db_row = NULL;
 
@@ -3445,8 +3444,18 @@ static void renew(void)
 				"mail_domains.domain_id = %d", domain_id);
 	db_row = get_dbrow(res);
 	amount = strtod(get_var(db_row, "amount"), NULL);
-	expires = atol(get_var(db_row, "expires"));
-	n_expires = expires + 86400 * 365;
+
+	/*
+	 * If the domain hasn't expired then the new expiry date is
+	 * set from the expires date. If it has, it's set from now.
+	 */
+	if (strcmp(get_var(db_row, "expired"), "0") == 0) {
+		time_t expires = atol(get_var(db_row, "expires"));
+		n_expires = expires + 86400 * 365;
+	} else {
+		n_expires = time(NULL) + 86400 * 365;
+	}
+
 	domain = make_mysql_safe_string(get_var(db_row, "domain"));
 	mysql_free_result(res);
 
