@@ -554,18 +554,15 @@ static void delete_mail_fwd_record(void)
 {
 	int domain_id;
 	MYSQL *mconn;
-	MYSQL_RES *res;
 	const char *d_sql = "DELETE FROM postfix.forwarding WHERE "
 		"domain_id = %d AND source = '%s'";
 
 	domain_id = atoi(qvar("domain_id"));
-	if (!valid_csrf_token())
-		goto out2;
 
-	res = sql_query(conn, "SELECT domain_id FROM mail_domains WHERE "
-			"uid = %u AND domain_id = %d", user_session.uid,
-			domain_id);
-	if (mysql_num_rows(res) == 0)
+	if (!valid_csrf_token())
+		goto out;
+
+	if (!is_users_domain(domain_id, "mail_domains"))
 		goto out;
 
 	sql_query(conn, d_sql, domain_id, qvar("source"));
@@ -575,8 +572,6 @@ static void delete_mail_fwd_record(void)
 	mysql_close(mconn);
 
 out:
-	mysql_free_result(res);
-out2:
 	fcgx_p("Location: /mail_forwarding/?domain_id=%d\r\n\r\n", domain_id);
 }
 
