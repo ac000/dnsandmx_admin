@@ -898,15 +898,13 @@ static void delete_dns_record(void)
 {
 	int domain_id;
 	int record_id;
-	MYSQL_RES *res;
 
 	domain_id = atoi(qvar("domain_id"));
-	if (!valid_csrf_token())
-		goto out2;
 
-	res = sql_query(conn, "SELECT domain_id FROM domains WHERE uid = %u "
-			"AND domain_id = %d", user_session.uid, domain_id);
-	if (mysql_num_rows(res) == 0)
+	if (!valid_csrf_token())
+		goto out;
+
+	if (!is_users_domain(domain_id, "domains"))
 		goto out;
 
 	record_id = atoi(qvar("record_id"));
@@ -922,8 +920,6 @@ static void delete_dns_record(void)
 			"pdns.records.domain_id = %d AND pdns.records.type = "
 			"'SOA'", time(NULL), domain_id);
 out:
-	mysql_free_result(res);
-out2:
 	fcgx_p("Location: /records/?domain_id=%d&type=%s\r\n\r\n",
 			domain_id, qvar("type"));
 }
