@@ -3400,7 +3400,6 @@ static void add_funds(void)
  */
 static void renew(void)
 {
-	unsigned long nr_rows;
 	int domain_id;
 	MYSQL_RES *res;
 	TMPL_varlist *vl = NULL;
@@ -3426,12 +3425,7 @@ static void renew(void)
 		return;
 
 	domain_id = atoi(qvar("domain_id"));
-	res = sql_query(conn, "SELECT domain_id FROM %s WHERE uid = %u AND "
-			"domain_id = %d", dtable, user_session.uid,
-			domain_id);
-	nr_rows = mysql_num_rows(res);
-	mysql_free_result(res);
-	if (nr_rows == 0)
+	if (!is_users_domain(domain_id, dtable))
 		return;
 
 	if (strcmp(qvar("type"), "dns") == 0)
