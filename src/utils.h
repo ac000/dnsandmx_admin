@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2012 - 2013	OpenTech Labs
  *				Andrew Clayton <andrew@digital-domain.net>
- *			2013	DNSandMX
+ *		 2013 - 2014	DNSandMX
  *				Andrew Clayton <andrew@dnsandmx.com>
  *
  * Licensed under the GNU Affero General Public License version 3
@@ -27,6 +27,7 @@ bool is_valid_ipv6_addr(const char *addr);
 bool is_valid_ipv4_addr(const char *addr);
 bool is_valid_hostname(const char *hostname);
 bool is_valid_email_address(const char *email_addr);
+bool is_users_domain(int domain_id, const char *table);
 bool is_domain_editable(int domain_id, const char *table);
 char *get_tenant(const char *host, char *tenant);
 char *username_to_name(const char *username);

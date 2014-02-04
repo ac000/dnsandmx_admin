@@ -262,6 +262,24 @@ bool is_valid_email_address(const char *email_addr)
 }
 
 /*
+ * Checks if a given domain belongs to the user in question.
+ */
+bool is_users_domain(int domain_id, const char *table)
+{
+	MYSQL_RES *res;
+	bool ret = false;
+
+	res = sql_query(conn, "SELECT domain_id FROM %s WHERE uid = %u AND "
+			"domain_id = %d", table, user_session.uid, domain_id);
+
+	if (mysql_num_rows(res) == 1)
+		ret = true;
+	mysql_free_result(res);
+
+	return ret;
+}
+
+/*
  * Checks if a domain is editable. A domain is editable if it is the
  * users domain and is is NOT expired.
  */
