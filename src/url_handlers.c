@@ -490,13 +490,8 @@ static void delete_mail_domain(void)
 	GHashTable *db_row = NULL;
 
 	domain_id = atoi(qvar("domain_id"));
-
-	res = sql_query(conn, "SELECT domain_id FROM mail_domains WHERE "
-			"uid = %u AND domain_id = %d", user_session.uid,
-			domain_id);
-	if (mysql_num_rows(res) == 0)
+	if (!is_users_domain(domain_id, "mail_domains"))
 		goto out;
-	mysql_free_result(res);
 
 	res = sql_query(conn, "SELECT domain, type FROM mail_domains WHERE "
 				"domain_id = %d", domain_id);
@@ -506,6 +501,8 @@ static void delete_mail_domain(void)
 	vl = add_html_var(vl, "domain", domain);
 	vl = add_html_var(vl, "domain_id", qvar("domain_id"));
 	vl = add_html_var(vl, "username", user_session.username);
+	free_vars(db_row);
+	mysql_free_result(res);
 
 	if (IS_POST() && valid_csrf_token()) {
 		int ret;
@@ -540,14 +537,12 @@ static void delete_mail_domain(void)
 			vl = add_html_var(vl, "auth_err", "yes");
 		}
 	}
-	free_vars(db_row);
 
 out:
 	add_csrf_token(vl);
 	fmtlist = TMPL_add_fmt(fmtlist, "de_xss", de_xss);
 	send_template("templates/delete_mail_domain.tmpl", vl, fmtlist);
 out2:
-	mysql_free_result(res);
 	TMPL_free_varlist(vl);
 	TMPL_free_fmtlist(fmtlist);
 }
