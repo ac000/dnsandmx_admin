@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2012 - 2013	OpenTech Labs
  *				Andrew Clayton <andrew@digital-domain.net>
- *			2013	DNSandMX
+ *		 2013 - 2014	DNSandMX
  *				Andrew Clayton <andrew@dnsandmx.com>
  *
  * Licensed under the GNU Affero General Public License version 3
@@ -270,17 +270,12 @@ bool is_domain_editable(int domain_id, const char *table)
 	MYSQL_RES *res;
 	bool ret = false;
 
-	res = sql_query(conn, "SELECT domain_id, expired FROM %s WHERE "
-			"uid = %u AND domain_id = %d", table, user_session.uid,
-			domain_id);
+	res = sql_query(conn, "SELECT domain_id FROM %s WHERE uid = %u AND "
+			"domain_id = %d AND expired = 0", table,
+			user_session.uid, domain_id);
 
-        if (mysql_num_rows(res) == 1) {
-		GHashTable *db_row = get_dbrow(res);
-
-		if (!atoi(get_var(db_row, "expired")))
-			ret = true;
-		free_vars(db_row);
-	}
+	if (mysql_num_rows(res) == 1)
+		ret = true;
 	mysql_free_result(res);
 
 	return ret;
