@@ -2996,20 +2996,18 @@ static void records(void)
 {
 	const char *type = qvar("type");
 
-	if (!IS_SET(type) || strcmp(type, "soa") == 0)
-		entry_soa();
-	else if (strcmp(type, "ns") == 0 ||
-		 strcmp(type, "a") == 0 ||
-		 strcmp(type, "aaaa") == 0 ||
-		 strcmp(type, "cname") == 0 ||
-		 strcmp(type, "loc") == 0 ||
-		 strcmp(type, "mx") == 0 ||
-		 strcmp(type, "naptr") == 0 ||
-		 strcmp(type, "ptr") == 0 ||
-		 strcmp(type, "rp") == 0 ||
-		 strcmp(type, "spf") == 0 ||
-		 strcmp(type, "srv") == 0 ||
-		 strcmp(type, "txt") == 0)
+	if (strcmp(type, "ns") == 0 ||
+	    strcmp(type, "a") == 0 ||
+	    strcmp(type, "aaaa") == 0 ||
+	    strcmp(type, "cname") == 0 ||
+	    strcmp(type, "loc") == 0 ||
+	    strcmp(type, "mx") == 0 ||
+	    strcmp(type, "naptr") == 0 ||
+	    strcmp(type, "ptr") == 0 ||
+	    strcmp(type, "rp") == 0 ||
+	    strcmp(type, "spf") == 0 ||
+	    strcmp(type, "srv") == 0 ||
+	    strcmp(type, "txt") == 0)
 		get_records(type);
 	else
 		entry_soa();
