@@ -583,7 +583,6 @@ static void issue_etrn(void)
 	int domain_id;
 	int sockfd;
 	int len;
-	MYSQL_RES *mres;
 	const char *domain;
 	struct addrinfo hints;
 	struct addrinfo *res;
@@ -592,13 +591,11 @@ static void issue_etrn(void)
 	bool err = true;
 
 	domain_id = atoi(qvar("domain_id"));
-	if (!valid_csrf_token())
-		goto out3;
 
-	mres = sql_query(conn, "SELECT domain_id FROM mail_domains WHERE "
-			"uid = %u AND domain_id = %d", user_session.uid,
-			domain_id);
-	if (mysql_num_rows(mres) == 0)
+	if (!valid_csrf_token())
+		goto out2;
+
+	if (!is_users_domain(domain_id, "mail_domains"))
 		goto out2;
 
 	hints.ai_family = AF_UNSPEC;
@@ -643,8 +640,6 @@ static void issue_etrn(void)
 out:
 	close(sockfd);
 out2:
-	mysql_free_result(mres);
-out3:
 	fcgx_p("Location: /backup_mx/?domain_id=%d&etrn=%d\r\n\r\n",
 		domain_id, err);
 }
