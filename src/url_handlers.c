@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2012 - 2013	OpenTech Labs
  *				Andrew Clayton <andrew@digital-domain.net>
- *			2013	DNSandMX
+ *		 2013 - 2014	DNSandMX
  *				Andrew Clayton <andrew@dnsandmx.com>
  *
  * Licensed under the GNU Affero General Public License version 3
@@ -757,7 +757,7 @@ static void add_dns_domain(void)
 		 * If we are to be a slave for this domain, we need the
 		 * master name servers IP address.
 		 *
-		 * The craxy domain_sql_fmt thing is just so we can get A
+		 * The crazy domain_sql_fmt thing is just so we can get A
 		 * NULL into the database for when there is no MASTER.
 		 *
 		 * NULL doesn't go into the databases quoted but an IP
