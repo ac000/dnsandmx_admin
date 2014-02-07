@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2012 - 2013	OpenTech Labs
  *				Andrew Clayton <andrew@digital-domain.net>
- *			2013	DNSandMX
+ *		 2013 - 2014	DNSandMX
  *				Andrew Clayton <andrew@dnsandmx.com>
  *
  * Licensed under the GNU Affero General Public License version 3
