@@ -32,13 +32,10 @@ void dump_dns_domain_to_bind(int domain_id)
 	char *domain;
 	const char *def_ttl;
 
-	res = sql_query(conn, "SELECT domain_id FROM domains WHERE uid = %u "
-			"AND domain_id = %d", user_session.uid, domain_id);
-	if (mysql_num_rows(res) == 0) {
+	if (!is_users_domain(domain_id, "domains")) {
 		fcgx_p("Location: /tools/\r\n\r\n");
-		goto out;
+		return;
 	}
-	mysql_free_result(res);
 
 	res = sql_query(conn, "SELECT name FROM pdns.domains WHERE id = %d",
 			domain_id);
@@ -127,8 +124,6 @@ void dump_dns_domain_to_bind(int domain_id)
 	fcgx_p("%s", ptr);
 
 	free(ptr);
-
-out:
 	mysql_free_result(res);
 }
 
