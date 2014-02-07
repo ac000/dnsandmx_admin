@@ -995,7 +995,6 @@ void free_user_session(void)
 	free(user_session.username);
 	free(user_session.name);
 	free(user_session.client_id);
-	free(user_session.user_hdr);
 }
 
 /*

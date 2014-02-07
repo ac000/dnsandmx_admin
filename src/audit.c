@@ -349,8 +349,6 @@ void set_user_session(void)
 	char sid[21];
 	char restrict_ip[2];
 	char capabilities[4];
-	char user_hdr[1025];
-	char *xss_string;
 	const char *rbuf;
 
 	/*
@@ -398,18 +396,6 @@ void set_user_session(void)
 	tcmapdel(cols);
 	tclistdel(res);
 	tctdbqrydel(qry);
-
-	/*
-	 * Set the user header banner, which displays the users name, uid and
-	 * whether they are an Approver and or Admin.
-	 */
-	xss_string = xss_safe_string(user_session.name);
-	snprintf(user_hdr, sizeof(user_hdr), "<big><big> %s</big></big><small>"
-			"<span class = \"lighter\"> (%d) </span>"
-			"</small>", xss_string, user_session.uid);
-	free(xss_string);
-	strncat(user_hdr, "&nbsp;", 1024 - strlen(user_hdr));
-	user_session.user_hdr = strdup(user_hdr);
 
 	/*
 	 * We want to update the last_seen timestamp in the users session.

@@ -164,7 +164,6 @@ struct user_session {
 	char session_id[SID_LEN + 1];
 	char csrf_token[CSRF_LEN + 1];
 	bool restrict_ip;
-	char *user_hdr;
 };
 struct user_session user_session;
 
