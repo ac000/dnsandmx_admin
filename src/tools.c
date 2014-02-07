@@ -234,14 +234,10 @@ void dump_mail_fwd_to_csv(int domain_id)
 	char *ptr;
 	char *domain;
 
-	res = sql_query(conn, "SELECT domain_id FROM mail_domains WHERE uid = "
-			"%u AND domain_id = %d AND type = 'FWD'",
-			user_session.uid, domain_id);
-	if (mysql_num_rows(res) == 0) {
+	if (!is_users_domain(domain_id, "mail_domains")) {
 		fcgx_p("Location: /tools/\r\n\r\n");
-		goto out;
+		return;
 	}
-	mysql_free_result(res);
 
 	res = sql_query(conn, "SELECT domain FROM mail_domains WHERE "
 			"domain_id = %d", domain_id);
@@ -278,7 +274,5 @@ void dump_mail_fwd_to_csv(int domain_id)
 	fcgx_p("%s", ptr);
 
 	free(ptr);
-
-out:
 	mysql_free_result(res);
 }
