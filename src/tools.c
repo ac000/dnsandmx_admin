@@ -1,7 +1,7 @@
 /*
  * tools.c - Functions for the various actions under /tools/
  *
- * Copyright (C) 2013		DNSandMX
+ * Copyright (C) 2013 - 2014	DNSandMX
  * 				Andrew Clayton <andrew@dnsandmx.com>
  *
  * Licensed under the GNU Affero General Public License version 3
