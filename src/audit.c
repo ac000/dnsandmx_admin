@@ -223,10 +223,13 @@ static time_t get_last_login(char *from_host)
 	 * This ensures we actually get the last login and not the
 	 * current login.
 	 *
+	 * If the hostname field is empty, use the IP address instead.
+	 *
 	 * If the user has never logged in before, we will get an empty row.
 	 */
-	res = sql_query(conn, "SELECT login_at, hostname FROM utmp WHERE uid "
-			"= %u ORDER BY login_at DESC LIMIT 1, 1",
+	res = sql_query(conn, "SELECT login_at, "
+			"IF(LENGTH(hostname), hostname, ip) AS host FROM utmp "
+			"WHERE uid = %u ORDER BY login_at DESC LIMIT 1, 1",
 			user_session.uid);
 	if (mysql_num_rows(res) > 0) {
 		row = mysql_fetch_row(res);
