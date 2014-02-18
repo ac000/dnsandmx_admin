@@ -18,6 +18,7 @@
 #include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <netdb.h>
 
 #include <glib.h>
 
@@ -225,7 +226,7 @@ bool is_valid_hostname(const char *hostname)
 		return false;
 
 	/* Length check */
-	if (strlen(hostname) < 1 || strlen(hostname) > 63)
+	if (strlen(hostname) < 1 || strlen(hostname) >= NI_MAXHOST)
 		return false;
 
 	/* First character check */
