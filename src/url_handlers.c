@@ -377,11 +377,11 @@ static void add_mail_domain(void)
 
 		m_type = qvar("mail_type");
 
-		if (!IS_SET(qvar("dax_domain"))) {
+		domain = make_mysql_safe_string(qvar("dax_domain"));
+		if (!is_valid_hostname(domain)) {
 			form_err = true;
 			vl = add_html_var(vl, "domain_error", "true");
 		}
-		domain = make_mysql_safe_string(qvar("dax_domain"));
 		dotchomp(domain);
 		res = sql_query(conn, "SELECT domain FROM mail_domains WHERE "
 				"domain = '%s'", domain);
