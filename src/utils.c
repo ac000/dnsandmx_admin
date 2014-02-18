@@ -255,10 +255,27 @@ bool is_valid_hostname(const char *hostname)
  */
 bool is_valid_email_address(const char *email_addr)
 {
-	if (!strstr(email_addr, "@") || !strstr(email_addr, "."))
-		return false;
-	else
-		return true;
+	bool ret = false;
+	char *p;
+
+	if (strlen(email_addr) < 3)
+		goto out;
+
+	if (email_addr[strlen(email_addr) - 1] == '.')
+		goto out;
+
+	p = strstr(email_addr, "@");
+	if (!p) {
+		goto out;
+	} else {
+		if (*(++p) == '.')
+			goto out;
+		else
+			ret = true;
+	}
+
+out:
+	return ret;
 }
 
 /*
