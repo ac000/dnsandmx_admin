@@ -713,7 +713,7 @@ static void add_dns_domain(void)
 		else
 			s_type = "SLAVE";
 
-		if (!IS_SET(domain)) {
+		if (!is_valid_hostname(domain)) {
 			form_err = true;
 			vl = add_html_var(vl, "domain_error", "true");
 		}
