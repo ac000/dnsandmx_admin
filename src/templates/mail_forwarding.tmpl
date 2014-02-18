@@ -53,7 +53,7 @@ Mail forwarding<span class = "lighter"> for </span><tmpl_var name = "domain" fmt
 	<td><a href = "/mail_fwd_record/?domain_id=<tmpl_var name = 'domain_id' />&record_id=<tmpl_var name = 'record_id' />"><img src = "/static/images/edit.png" height = "20" alt = "edit record" /> edit</a>
 	</td>
 	<td></td>
-	<td><form action = "/delete_mail_fwd_record/?domain_id=<tmpl_var name = 'domain_id' />&source=<tmpl_var name = 'source' fmt = 'de_xss' />" method = "POST">
+	<td><form action = "/delete_mail_fwd_record/?domain_id=<tmpl_var name = 'domain_id' />&record_id=<tmpl_var name = 'record_id' />" method = "POST">
 		<input type = "hidden" name = "csrf_token"
 			value = "<tmpl_var name = 'csrf_token' />" />
 		<input type = "submit" class = "form_btn_red"
