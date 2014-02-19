@@ -833,7 +833,7 @@ out:
 static void delete_dns_domain(void)
 {
 	int domain_id;
-	const char *domain;
+	char *domain;
 	MYSQL_RES *res;
 	TMPL_varlist *vl = NULL;
 	TMPL_fmtlist *fmtlist = NULL;
@@ -847,7 +847,7 @@ static void delete_dns_domain(void)
 			"pdns.domains WHERE pdns.domains.id = %d",
 			domain_id);
 	db_row = get_dbrow(res);
-	domain = get_var(db_row, "domain");
+	domain = strdupa(get_var(db_row, "domain"));
 	vl = add_html_var(vl, "domain", domain);
 	vl = add_html_var(vl, "domain_id", qvar("domain_id"));
 	vl = add_html_var(vl, "username", user_session.username);
