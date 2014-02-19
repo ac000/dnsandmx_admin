@@ -483,7 +483,7 @@ static void delete_mail_domain(void)
 {
 	int domain_id;
 	const char *domain;
-	const char *type;
+	char *type;
 	MYSQL_RES *res;
 	TMPL_varlist *vl = NULL;
 	TMPL_fmtlist *fmtlist = NULL;
@@ -496,7 +496,7 @@ static void delete_mail_domain(void)
 	res = sql_query(conn, "SELECT domain, type FROM mail_domains WHERE "
 				"domain_id = %d", domain_id);
 	db_row = get_dbrow(res);
-	type = get_var(db_row, "type");
+	type = strdupa(get_var(db_row, "type"));
 	domain = get_var(db_row, "domain");
 	vl = add_html_var(vl, "domain", domain);
 	vl = add_html_var(vl, "domain_id", qvar("domain_id"));
