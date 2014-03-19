@@ -141,11 +141,8 @@ static void dump_session_state(void)
 	TCTDB *tdb;
 	TDBQRY *qry;
 	TCLIST *res;
-	TCMAP *cols;
 	int i;
-	int rsize;
 	int nres;
-	const char *rbuf;
 
 	tdb = tctdbnew();
 	tctdbopen(tdb, SESSION_DB, TDBOREADER);
@@ -155,10 +152,12 @@ static void dump_session_state(void)
 	nres = tclistnum(res);
 	fprintf(debug_log, "Number of active sessions: %d\n", nres);
 	for (i = 0; i < nres; i++) {
-		unsigned char capabilities;
+		int rsize;
+		const char *rbuf = tclistval(res, i, &rsize);
+		TCMAP *cols = tctdbget(tdb, rbuf, rsize);
+		unsigned char capabilities = atoi(tcmapget2(
+					cols, "capabilities"));
 
-		rbuf = tclistval(res, i, &rsize);
-		cols = tctdbget(tdb, rbuf, rsize);
 		tcmapiterinit(cols);
 
 		fprintf(debug_log, "\ttenant       : %s\n", tcmapget2(cols,
@@ -167,7 +166,6 @@ static void dump_session_state(void)
 					"sid"));
 		fprintf(debug_log, "\tuid          : %s\n", tcmapget2(cols,
 					"uid"));
-		capabilities = atoi(tcmapget2(cols, "capabilities"));
 		fprintf(debug_log, "\tcapabilities : %d\n", capabilities);
 		fprintf(debug_log, "\tusername     : %s\n", tcmapget2(cols,
 					"username"));
@@ -332,8 +330,6 @@ static void check_dns_domain_expiry(void)
 			MYSQL *sconn;
 			const char *r_sql = "UPDATE pdns.records SET name = "
 				"CONCAT(\"!!\", name) WHERE domain_id = %d";
-			const char *s_sql = "UPDATE pdns.domains SET master = "
-				"CONCAT(\"!!\", master) WHERE id = %d";
 
 			sql_query(conn, "UPDATE domains SET expired = 1 WHERE "
 					"domain_id = %d", domain_id);
@@ -342,6 +338,10 @@ static void check_dns_domain_expiry(void)
 			sconn = db_conn(db_shost, "pdns", true);
 			sql_query(sconn, r_sql, domain_id);
 			if (strcmp(get_var(db_row, "type"), "SLAVE") == 0) {
+				const char *s_sql = "UPDATE pdns.domains SET "
+					"master = CONCAT(\"!!\", master) WHERE "
+					"id = %d";
+
 				sql_query(conn, s_sql, domain_id);
 				sql_query(sconn, s_sql, domain_id);
 			}
@@ -422,8 +422,6 @@ static void check_mail_domain_expiry(void)
 		if (tnow >= texpires) {
 			/* Domain has expired */
 			MYSQL *sconn;
-			const char *f_sql = "UPDATE postfix.local_domains SET "
-				"enabled = 0 WHERE domain_id = %d";
 
 			sql_query(conn, "UPDATE mail_domains SET expired = 1 "
 					"WHERE domain_id = %d", domain_id);
@@ -435,6 +433,10 @@ static void check_mail_domain_expiry(void)
 						"enabled = 0 WHERE domain_id "
 						"= %d", domain_id);
 			} else {
+				const char *f_sql = "UPDATE "
+					"postfix.local_domains SET enabled = 0 "
+					"WHERE domain_id = %d";
+
 				sql_query(conn, f_sql, domain_id);
 				sql_query(sconn, f_sql, domain_id);
 			}
