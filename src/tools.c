@@ -230,7 +230,6 @@ void dump_mail_fwd_to_csv(int domain_id)
 	FILE *out;
 	MYSQL_RES *res;
 	MYSQL_ROW row;
-	GHashTable *db_row = NULL;
 	char *ptr;
 	char *domain;
 
@@ -256,6 +255,7 @@ void dump_mail_fwd_to_csv(int domain_id)
 		const char *source;
 		const char *destination;
 		const char *csv_fmt = "%s\t%s\n";
+		GHashTable *db_row = NULL;
 
 		db_row = get_dbrow(res);
 		source = get_var(db_row, "source");
