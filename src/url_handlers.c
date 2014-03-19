@@ -3020,7 +3020,6 @@ static void records(void)
 static void backup_mx(void)
 {
 	int domain_id;
-	int queue_sz;
 	MYSQL *mconn;
 	MYSQL_RES *res;
 	TMPL_varlist *vl = NULL;
@@ -3042,7 +3041,6 @@ static void backup_mx(void)
 	res = sql_query(mconn, "SELECT domain, queue_sz FROM relay_domains "
 			"WHERE domain_id = %d", domain_id);
 	db_row = get_dbrow(res);
-	queue_sz = atoi(get_var(db_row, "queue_sz"));
 
 	vl = add_html_var(vl, "domain", get_var(db_row, "domain"));
 	vl = add_html_var(vl, "domain_id", qvar("domain_id"));
