@@ -3354,7 +3354,7 @@ out:
 static void add_funds(void)
 {
 	TMPL_varlist *vl = NULL;
-        TMPL_fmtlist *fmtlist = NULL;
+	TMPL_fmtlist *fmtlist = NULL;
 
 	if (IS_POST() && valid_csrf_token()) {
 		char uid[11];
