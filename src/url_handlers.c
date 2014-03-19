@@ -59,14 +59,14 @@ struct dom_rec_ent {
 static void login(void)
 {
 	int ret = 1;
-	unsigned long long sid;
 	TMPL_varlist *vl = NULL;
 	TMPL_fmtlist *fmtlist = NULL;
 
 	if (qvars) {
 		ret = check_auth();
 		if (ret == 0) {
-			sid = log_login();
+			unsigned long long sid = log_login();
+
 			create_session(sid);
 			fcgx_p("Location: /overview/\r\n\r\n");
 			return; /* Successful login */
@@ -3355,11 +3355,11 @@ static void add_funds(void)
 {
 	TMPL_varlist *vl = NULL;
         TMPL_fmtlist *fmtlist = NULL;
-	bool form_err = false;
 
 	if (IS_POST() && valid_csrf_token()) {
 		char uid[11];
 		int amount = atoi(qvar("dax_amount"));
+		bool form_err = false;
 
 		if (amount < 5 || amount % 5 > 0) {
 			form_err = true;
@@ -3520,9 +3520,6 @@ static void renew(void)
 				const char *r_sql = "UPDATE pdns.records SET "
 					"name = SUBSTRING(name FROM 3) WHERE "
 					"domain_id = %d";
-				const char *s_sql = "UPDATE pdns.domains SET "
-					"master = SUBSTRING(master FROM 3) "
-					"WHERE id = %d";
 				const char *d_type = get_var(db_row, "dtype");
 				MYSQL *sconn;
 
@@ -3530,6 +3527,11 @@ static void renew(void)
 				sconn = db_conn(db_shost, "pdns", true);
 				sql_query(sconn, r_sql, domain_id);
 				if (strcmp(d_type, "SLAVE") == 0) {
+					const char *s_sql = "UPDATE "
+						"pdns.domains SET master = "
+						"SUBSTRING(master FROM 3) "
+						"WHERE id = %d";
+
 					sql_query(conn, s_sql, domain_id);
 					sql_query(sconn, s_sql, domain_id);
 				}
