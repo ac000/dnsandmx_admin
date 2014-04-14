@@ -1079,7 +1079,8 @@ void send_expiry_mail(const char *name, const char *address,
 	struct tm *tm = gmtime(&expires);
 
 	fprintf(fp, "From: %s\r\n", MAIL_FROM);
-	fprintf(fp, "Subject: Service Expiry Warning for %s\r\n", domain);
+	fprintf(fp, "Subject: DNSandMX service expiry warning for %s\r\n",
+			domain);
 	fprintf(fp, "To: %s <%s>\r\n", name, address);
 	fputs("Content-Type: text/plain; charset=us-ascii\r\n", fp);
 	fputs("Content-Transfer-Encoding: 7bit\r\n", fp);
@@ -1114,7 +1115,8 @@ void send_expired_mail(const char *name, const char *address,
 	struct tm *tm = gmtime(&expires);
 
 	fprintf(fp, "From: %s\r\n", MAIL_FROM);
-	fprintf(fp, "Subject: Service Expiry Notification for %s\r\n", domain);
+	fprintf(fp, "Subject: DNSandMX service expiry notification for %s\r\n",
+			domain);
 	fprintf(fp, "To: %s <%s>\r\n", name, address);
 	fputs("Content-Type: text/plain; charset=us-ascii\r\n", fp);
 	fputs("Content-Transfer-Encoding: 7bit\r\n", fp);
