@@ -1457,11 +1457,14 @@ void send_template(const char *template, TMPL_varlist *varlist,
 		   TMPL_fmtlist *fmtlist)
 {
 	/*
-	 * Add the user's name and last login to the template varlist, we
-	 * use these on every page.
+	 * Add the user's name and last login to the template varlist, except
+	 * for pages where there is no user session or the /logout/ page.
 	 */
-	varlist = add_html_var(varlist, "banner_user", user_session.name);
-	display_last_login(varlist, true);
+	if (user_session.name && !strstr(env_vars.request_uri, "/logout/")) {
+		varlist = add_html_var(varlist, "banner_user",
+				user_session.name);
+		display_last_login(varlist, true);
+	}
 
 	fcgx_p("Content-Type: text/html\r\n\r\n");
 	TMPL_write(template, NULL, fmtlist, varlist, fcgx_out, error_log);

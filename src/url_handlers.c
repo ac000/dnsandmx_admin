@@ -4180,6 +4180,7 @@ void handle_request(void)
 	qvars = NULL;
 	avars = NULL;
 	u_files = NULL;
+	user_session.name = NULL;
 
 	set_env_vars();
 	request_uri = strdupa(env_vars.request_uri);
