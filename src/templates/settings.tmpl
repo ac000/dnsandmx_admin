@@ -87,6 +87,27 @@
 	</tr>
 	<tr><td><br /></td></tr>
 	<tr>
+	<td style="vertical-align: top"><br />IP Address ACL </td>
+	<td>
+		<big><span class = "lighter">Allow access only from specific IPs and Networks</span></big><br />
+		<textarea name = "dax_ipacl" rows = "4" cols = "36"><tmpl_var name = "dax_ipacl" fmt = "de_xss" /></textarea>
+		<br />
+		<input type = "checkbox" name = "dax_ipacl_act" value = "true"
+			<tmpl_if name = "dax_ipacl_act" value = "1">
+				checked
+			</tmpl_if> />
+		Enable IP Address Access Control
+	</td>
+	<td style="vertical-align: top" class = "lighter">Examples: (add one per line)<br />
+		192.168.1.10<br />
+		192.168.1.0/24<br />
+		2a01:7e00::f03c:91ff:fe69:2c5b<br />
+		2a01:7e00::/64<br />
+	</td>
+	</tr>
+
+	<tr><td><br /></td></tr>
+	<tr>
 	<td></td>
 	<td>
 		<tmpl_if name = "pass_error" value = "mismatch">

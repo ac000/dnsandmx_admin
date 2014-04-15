@@ -77,6 +77,8 @@ static void login(void)
 		vl = add_html_var(vl, "logged_in", "no");
 	if (ret == -2)
 		vl = add_html_var(vl, "enabled", "no");
+	if (ret == -3)
+		vl = add_html_var(vl, "ipacl", env_vars.remote_addr);
 	vl = add_html_var(vl, "www_host", WWW_HOST);
 
 	fmtlist = TMPL_add_fmt(fmtlist, "de_xss", de_xss);
@@ -169,6 +171,7 @@ static void __update_user_settings(void)
 	TCMAP *cols;
 	int rsize;
 	int primary_key_size;
+	int ipacl = 0;
 	const char *rbuf;
 	const char *hash;
 	char pkbuf[256];
@@ -180,6 +183,7 @@ static void __update_user_settings(void)
 	char capabilities[4];
 	char *username;
 	char *name;
+	char *acl;
 
 	if (IS_SET(qvar("dax_pass1"))) {
 		hash = generate_password_hash(SHA512, qvar("dax_pass1"));
@@ -199,6 +203,17 @@ static void __update_user_settings(void)
 	sql_query(conn, "UPDATE passwd SET username = '%s', password = '%s', "
 			"name = '%s' WHERE uid = %u",
 			username, hash, name, user_session.uid);
+
+	if (IS_SET(qvar("dax_ipacl_act")))
+		ipacl = 1;
+	acl = make_mysql_safe_string(qvar("dax_ipacl"));
+	/*
+	 * We store the ACL as space separated values but they are
+	 * displayed and entered one per line
+	 */
+	sql_query(conn, "REPLACE INTO ipacl (uid, enabled, list) VALUES "
+			"(%u, %d, REPLACE('%s', '\r\n', ' '))",
+			user_session.uid, ipacl, acl);
 
 	/*
 	 * We want to update the users session.entry. This entails removing
@@ -251,6 +266,7 @@ static void __update_user_settings(void)
 	tctdbdel(tdb);
 	free(username);
 	free(name);
+	free(acl);
 }
 
 /*
@@ -330,8 +346,10 @@ static void settings(void)
 		MYSQL_RES *res;
 		GHashTable *db_row = NULL;
 
-		res = sql_query(conn, "SELECT username, name FROM passwd WHERE "
-				"uid = %u", user_session.uid);
+		res = sql_query(conn, "SELECT username, name, ipacl.enabled, "
+				"REPLACE(ipacl.list, ' ', '\r\n') AS list "
+				"FROM passwd, ipacl WHERE passwd.uid = %u AND "
+				"ipacl.uid = passwd.uid", user_session.uid);
 		db_row = get_dbrow(res);
 
 		vl = add_html_var(vl, "username", get_var(db_row, "username"));
@@ -340,6 +358,9 @@ static void settings(void)
 		vl = add_html_var(vl, "dax_email2", get_var(db_row,
 					"username"));
 		vl = add_html_var(vl, "dax_name", get_var(db_row, "name"));
+		vl = add_html_var(vl, "dax_ipacl", get_var(db_row, "list"));
+		vl = add_html_var(vl, "dax_ipacl_act", get_var(db_row,
+					"enabled"));
 
 		free_vars(db_row);
 		mysql_free_result(res);
@@ -348,6 +369,8 @@ static void settings(void)
 		vl = add_html_var(vl, "dax_email1", qvar("dax_email1"));
 		vl = add_html_var(vl, "dax_email2", qvar("dax_email2"));
 		vl = add_html_var(vl, "dax_name", qvar("dax_name"));
+		vl = add_html_var(vl, "dax_ipacl", qvar("dax_ipacl"));
+		vl = add_html_var(vl, "dax_ipacl_act", qvar("dax_ipacl_act"));
 	}
 
 	vl = add_csrf_token(vl);
@@ -3887,6 +3910,8 @@ static void activate_account(void)
 			sql_query(conn, "UNLOCK TABLES");
 			sql_query(conn, "INSERT INTO balances (uid, amount)"
 					"VALUES (%u, 0.0)", uid);
+			sql_query(conn, "INSERT INTO ipacl (uid, enabled, "
+					"list) VALUES (%u, 0, '')", uid);
 			sql_query(conn, "DELETE FROM pending_activations "
 					"WHERE akey = '%s'", key);
 

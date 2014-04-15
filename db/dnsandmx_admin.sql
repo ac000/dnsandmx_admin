@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.1.69, for redhat-linux-gnu (x86_64)
+-- MySQL dump 10.13  Distrib 5.1.73, for redhat-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: dnsandmx_admin
 -- ------------------------------------------------------
--- Server version	5.1.69
+-- Server version	5.1.73
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -48,6 +48,21 @@ CREATE TABLE `domains` (
   `notified` tinyint(1) NOT NULL DEFAULT '0',
   KEY `uid` (`uid`),
   KEY `domain_id` (`domain_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `ipacl`
+--
+
+DROP TABLE IF EXISTS `ipacl`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ipacl` (
+  `uid` int(10) unsigned NOT NULL,
+  `enabled` tinyint(1) NOT NULL DEFAULT '0',
+  `list` varchar(255) NOT NULL,
+  UNIQUE KEY `uid` (`uid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -162,4 +177,4 @@ CREATE TABLE `utmp` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-06-17 16:45:24
+-- Dump completed on 2014-04-15 12:23:49
