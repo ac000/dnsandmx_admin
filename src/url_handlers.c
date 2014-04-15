@@ -2781,7 +2781,7 @@ static void entry_soa(void)
 
 	if (mysql_num_rows(res) == 0) {
 		/*
-		 * We are a slave for this domsin and are waiting to do
+		 * We are a slave for this domain and are waiting to do
 		 * an initial AXFR. So there are no records yet.
 		 */
 		vl = add_html_var(vl, "axfr_done", "no");
