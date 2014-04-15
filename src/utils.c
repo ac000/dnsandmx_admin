@@ -1042,6 +1042,34 @@ void send_reset_password_mail(const char *address, const char *key)
 }
 
 /*
+ * Send an IP ACL deactivation email to the required user.
+ */
+void send_disable_ipacl_mail(const char *address, const char *key)
+{
+	FILE *fp = popen(MAIL_CMD, "w");
+
+	fprintf(fp, "From: %s\r\n", MAIL_FROM);
+	fprintf(fp, "Subject: DNSandMX IP ACL Deactivation Request\r\n");
+	fprintf(fp, "To: %s\r\n", address);
+	fputs("Content-Type: text/plain; charset=us-ascii\r\n", fp);
+	fputs("Content-Transfer-Encoding: 7bit\r\n", fp);
+	fputs("\r\n", fp);
+
+	fputs("You have requested to disable your IP ACL."
+			"\r\n\r\n", fp);
+	fputs("If this wasn't you, then just delete and ignore this email."
+			"\r\n\r\n", fp);
+	fputs("Please goto the below url to complete this action."
+			"\r\n", fp);
+	fputs("Note that this link is valid for 24 hours.\r\n", fp);
+	fputs("\r\n", fp);
+	fprintf(fp, "https://%s/disable_ipacl/?key=%s\r\n", env_vars.host,
+			key);
+
+	pclose(fp);
+}
+
+/*
  * Send an account activation email to the required user.
  */
 void send_activation_mail(const char *address, const char *key)

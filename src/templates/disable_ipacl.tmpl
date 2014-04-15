@@ -1,0 +1,84 @@
+<html>
+<head>
+	<title>DNSandMX : Disable IP Address Access Control</title>
+	<link href = "/static/css/main.css" rel = "stylesheet" type =
+		"text/css" />
+</head>
+<body>
+
+<div class = "user_wrapper">
+	<div class = "logo">
+		<a href = "/login/"><img src = "/static/images/logo.png"
+			alt = "logo" /></a>
+	</div>
+</div>
+<div style = "clear: both;"></div>
+<p />
+
+<tmpl_if name = "no_user" value = "yes">
+	<h2 class = "lighter">
+		There doesn't seem to be an account under the email address
+		<p />
+		<span class = "hblue"><tmpl_var name = 'email'
+		fmt = 'de_xss' /></span></h2>
+<tmpl_elsif name = "valid_key" value = "no">
+	<h2 class = "lighter">No matching key found. This is most likely due
+	to it expiring. Simply select to disable your IP ACL again to have
+	a new link sent to you.</span></h2>
+<tmpl_elsif name = "email_sent" value = "yes">
+<h2 class = "lighter">An email has been sent to <span class
+        = "hblue"><tmpl_var name = 'email' fmt = 'de_xss' /></h2>
+
+<big class = "lighter">
+It will come from <b>noreply@dnsandmx.com</b> with the subject of <b>DNSandMX
+IP ACL Deactivation Request</b>
+<p />
+Once you receive this email you need to visit the link within, either by
+clicking it or by copy and pasting it into your browser.
+<p />
+This link is valid for 24 hours,
+<p />
+If you fail to receive the email check your spam filters etc. You can click
+the disable IP ACL link and provide your email address again to have another
+email sent to you.
+</big>
+<tmpl_elsif name = "valid_key" value = "yes">
+	<h2 style = "color: #000000;"><span style =
+		"color: #647ba4;">DNS</span><span style =
+		"color: #828282;">and</span><span style =
+		"color: #647ba4;">MX</span> IP ACL Deactivation for
+		<span class = "hblue"><tmpl_var name = "email_addr" fmt =
+		"de_xss" /></span></h2>
+	<h3 class = "lighter">
+	Your IP Address Access Control has been disabled.<br />
+	Click <a href = "/login/">here</a> to login.
+	</h3>
+<tmpl_else>
+<h2 class = "lighter">
+To disable your IP ACL please provide the email address you use to login with.
+</h2>
+
+<center>
+	<form action = "/disable_ipacl/" method = "POST">
+	<table>
+	<tbody>
+	<tr>
+	<td>
+		<input type = "email" placeholder = "&nbsp;email address"
+			autocomplete = "off" name = "email_addr" size = "30"
+			maxlength = "255" style = "font-size: 18px" />
+	</td>
+	<td>
+		<input type = "image" src = "/static/images/submit.png"
+			border = "0" height = "36" alt = "Submit" />
+	</td>
+	<tr>
+	</tbody>
+	</table>
+	<input type = "hidden" name = "send_email" value = "yes" />
+	</form>
+</center>
+</tmpl_if>
+
+</body>
+</html>

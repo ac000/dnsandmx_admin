@@ -125,6 +125,21 @@ CREATE TABLE `pending_activations` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `pending_ipacl_deact`
+--
+
+DROP TABLE IF EXISTS `pending_ipacl_deact`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pending_ipacl_deact` (
+  `email` varchar(255) NOT NULL DEFAULT '',
+  `dkey` varchar(40) DEFAULT NULL,
+  `expires` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`email`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `transactions`
 --
 
@@ -177,4 +192,4 @@ CREATE TABLE `utmp` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-04-15 12:23:49
+-- Dump completed on 2014-04-15 18:54:04

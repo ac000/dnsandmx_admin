@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2012 - 2013	OpenTech Labs
  *				Andrew Clayton <andrew@digital-domain.net>
- *			2013	DNSandMX
+ *		 2013 - 2014	DNSandMX
  *				Andrew Clayton <andrew@dnsandmx.com>
  *
  * Licensed under the GNU Affero General Public License version 3
@@ -482,6 +482,16 @@ static void clear_pending_activations(void)
 	mysql_close(conn);
 }
 
+static void clear_pending_ipacl_deact(void)
+{
+	MYSQL *conn;
+
+	conn = db_conn(db_host, db_name, false);
+	sql_query(conn, "DELETE FROM pending_ipacl_deact WHERE %ld > expires",
+			time(NULL));
+	mysql_close(conn);
+}
+
 static void house_keeping(void)
 {
 	time_t tnow = time(NULL);
@@ -493,6 +503,7 @@ static void house_keeping(void)
 	}
 
 	clear_pending_activations();
+	clear_pending_ipacl_deact();
 	clear_old_sessions();
 
 	housekeeping = 0;

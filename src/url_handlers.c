@@ -4046,6 +4046,67 @@ out:
 	free(email);
 }
 
+/*
+ * /disable_ipacl/
+ *
+ * HTML is in templates/disable_ipacl.tmpl
+ */
+static void disable_ipacl(void)
+{
+	TMPL_varlist *vl = NULL;
+	TMPL_fmtlist *fmtlist = NULL;
+
+	if (IS_POST() && IS_SET(qvar("send_email"))) {
+		if (!user_already_exists(qvar("email_addr"))) {
+			vl = add_html_var(vl, "email", qvar("email_addr"));
+			vl = add_html_var(vl, "no_user", "yes");
+		} else {
+			char key[SHA1_LEN + 1];
+			char *email = NULL;
+
+			email = make_mysql_safe_string(qvar("email_addr"));
+			generate_hash(key, SHA1);
+			sql_query(conn, "REPLACE INTO pending_ipacl_deact "
+					"VALUES ('%s', '%s', %ld)", email, key,
+					time(NULL) + 86400);
+			send_disable_ipacl_mail(qvar("email_addr"), key);
+			vl = add_html_var(vl, "email_sent", "yes");
+			vl = add_html_var(vl, "email", qvar("email_addr"));
+			free(email);
+		}
+	} else if (IS_GET() && IS_SET(qvar("key"))) {
+		MYSQL_RES *res;
+
+		res = sql_query(conn, "SELECT email, passwd.uid FROM "
+				"pending_ipacl_deact, passwd WHERE "
+				"pending_ipacl_deact.dkey = '%s' AND "
+				"passwd.username = pending_ipacl_deact.email",
+				qvar("key"));
+		if (!mysql_num_rows(res)) {
+			vl = add_html_var(vl, "valid_key", "no");
+		} else {
+			char *key = make_mysql_safe_string(qvar("key"));
+			MYSQL_ROW row = mysql_fetch_row(res);
+			unsigned int uid = strtoul(row[1], NULL, 10);
+
+			sql_query(conn, "UPDATE ipacl SET enabled = 0 WHERE "
+					"uid = %u", uid);
+			sql_query(conn, "DELETE FROM pending_ipacl_deact "
+					"WHERE dkey = '%s'", key);
+			free(key);
+
+			vl = add_html_var(vl, "email_addr", row[0]);
+			vl = add_html_var(vl, "valid_key", "yes");
+		}
+		mysql_free_result(res);
+	}
+
+	fmtlist = TMPL_add_fmt(fmtlist, "de_xss", de_xss);
+	send_template("templates/disable_ipacl.tmpl", vl, fmtlist);
+	TMPL_free_fmtlist(fmtlist);
+	TMPL_free_varlist(vl);
+}
+
 static void tools(void)
 {
 	unsigned long nr_rows;
@@ -4239,6 +4300,7 @@ void handle_request(void)
 	uri_map("/sign_up/", sign_up);
 	uri_map("/activate_account/", activate_account);
 	uri_map("/reset_password/", reset_password);
+	uri_map("/disable_ipacl/", disable_ipacl);
 	uri_map("/login/", login);
 
 	logged_in = is_logged_in();

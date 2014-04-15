@@ -43,6 +43,7 @@ void free_env_vars(void);
 void free_user_session(void);
 void set_env_vars(void);
 void send_reset_password_mail(const char *address, const char *key);
+void send_disable_ipacl_mail(const char *address, const char *key);
 void send_activation_mail(const char *address, const char *key);
 void send_expiry_mail(const char *name, const char *address,
 		      const char *domain, const char *type, time_t expires);
