@@ -377,9 +377,6 @@ static time_t get_last_login(char *from_host)
 /*
  * Adds last login information to the page. Time and location of
  * last login.
- *
- * If this is the users first login, then "First login" is simply
- * displayed.
  */
 void display_last_login(TMPL_varlist *varlist, bool utc)
 {
@@ -394,8 +391,6 @@ void display_last_login(TMPL_varlist *varlist, bool utc)
 				localtime(&login));
 		varlist = add_html_var(varlist, "last_login", tbuf);
 		varlist = add_html_var(varlist, "last_login_from", host);
-	} else {
-		varlist = add_html_var(varlist, "last_login", "First login");
 	}
 }
 

@@ -13,9 +13,11 @@
 	<div class = "user_name">
 		<h3 style = "margin-top: 0px; margin-bottom: 2px">
 			<tmpl_var name = "banner_user" fmt = "de_xss" /></h3>
+		<tmpl_if name = "last_login">
 		<span class = "lighter small">
 			Last login: <tmpl_var name = "last_login" /> (UTC) from 			<tmpl_var name = "last_login_from" fmt = "de_xss" />
 		</span>
+		</tmpl_if>
 	</div>
 	<div class = "logo">
 		<img src = "/static/images/logo.png" alt = "logo" />
