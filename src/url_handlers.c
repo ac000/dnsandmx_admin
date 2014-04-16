@@ -3905,8 +3905,9 @@ static void activate_account(void)
 					qvar("dax_pass1"));
 
 			sql_query(conn, "INSERT INTO passwd VALUES "
-					"(%u, %u, '%s', '%s', '%s', 0, 1, '')",
-					uid, uid, email, password, name);
+					"(%u, %u, '%s', '%s', '%s', 0, 1, '', "
+					"%ld)", uid, uid, email, password,
+					name, time(NULL));
 			sql_query(conn, "UNLOCK TABLES");
 			sql_query(conn, "INSERT INTO balances (uid, amount)"
 					"VALUES (%u, 0.0)", uid);
