@@ -4226,13 +4226,7 @@ static bool match_uri(const char *uri)
 
 	rlen = strlen(request);
 
-	/*
-	 * The image URLs are a bit different, we only want to match on
-	 * the first /.../ part and they don't contain a ?.
-	 */
-	if (strstr(request, "/get_image/") && strstr(uri, "/get_image/"))
-		return true;
-	else if (strncmp(request, uri, mlen) == 0 && rlen == mlen)
+	if (strncmp(request, uri, mlen) == 0 && rlen == mlen)
 		return true;
 	else
 		return false;
