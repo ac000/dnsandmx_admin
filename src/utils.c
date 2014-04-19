@@ -1091,8 +1091,19 @@ void send_activation_mail(const char *address, const char *key)
 			"\r\n", fp);
 	fputs("Note that this activation link is valid for 24 hours.\r\n", fp);
 	fputs("\r\n", fp);
-	fprintf(fp, "https://%s/activate_account/?key=%s\r\n", env_vars.host,
-			key);
+	fprintf(fp, "https://%s/activate_account/?key=%s\r\n\r\n\r\n",
+			env_vars.host, key);
+	fputs("Thank you for choosing DNSandMX.\r\n\r\n", fp);
+	fputs("Once your account is activated you can login at\r\n", fp);
+	fprintf(fp, "https://%s/login/\r\n\r\n", env_vars.host);
+	fputs("You can find useful information at the following\r\n", fp);
+	fputs("http://dnsandmx.com/support.html\r\n", fp);
+	fprintf(fp, "https://%s/ips_and_hosts/\r\n\r\n", env_vars.host);
+	fputs("If you have any problems please drop an email to "
+			"support@dnsandmx.com\r\n", fp);
+	fputs("You can also try on IRC in #support on irc.dnsandmx.com"
+			"\r\n\r\n", fp);
+	fputs("DNSandMX.", fp);
 
 	pclose(fp);
 }
