@@ -387,8 +387,6 @@ static void settings(void)
  */
 static void add_mail_domain(void)
 {
-	char *domain = NULL;
-	const char *m_type;
 	bool form_err = false;
 	TMPL_varlist *vl = NULL;
 	TMPL_fmtlist *fmtlist = NULL;
@@ -396,12 +394,14 @@ static void add_mail_domain(void)
 	if (IS_POST() && valid_csrf_token()) {
 		MYSQL_RES *res;
 		MYSQL *mconn;
+		char *domain;
+		char *m_type;
 		unsigned long long id;
 
-		m_type = qvar("mail_type");
-
+		m_type = make_mysql_safe_string(qvar("mail_type"));
 		domain = make_mysql_safe_string(qvar("dax_domain"));
-		if (!is_valid_hostname(domain)) {
+
+		if (!is_valid_hostname(qvar("dax_domain"))) {
 			form_err = true;
 			vl = add_html_var(vl, "domain_error", "true");
 		}
@@ -468,6 +468,8 @@ static void add_mail_domain(void)
 					user_session.username);
 			mysql_close(mconn);
 		}
+		free(domain);
+		free(m_type);
 
 		if (!form_err) {
 			fcgx_p("Location: /overview/\r\n\r\n");
@@ -494,7 +496,6 @@ static void add_mail_domain(void)
         TMPL_free_fmtlist(fmtlist);
 out:
 	TMPL_free_varlist(vl);
-	free(domain);
 }
 
 /*
@@ -725,7 +726,7 @@ static void add_dns_domain(void)
 
 	if (IS_POST() && valid_csrf_token()) {
 		char *htmp;
-		const char *master;
+		char *master = NULL;
 		const char *domain_sql_fmt;
 		MYSQL_RES *res;
 
@@ -735,7 +736,7 @@ static void add_dns_domain(void)
 		else
 			s_type = "SLAVE";
 
-		if (!is_valid_hostname(domain)) {
+		if (!is_valid_hostname(qvar("dax_domain"))) {
 			form_err = true;
 			vl = add_html_var(vl, "domain_error", "true");
 		}
@@ -781,14 +782,14 @@ static void add_dns_domain(void)
 					"INSERT INTO pdns.domains "
 					"(name, master, type) VALUES "
 					"('%s', '%s', '%s')";
-				master = qvar("dax_master");
+				master = make_mysql_safe_string(
+						qvar("dax_master"));
 			}
 		} else {
 			domain_sql_fmt =
 				"INSERT INTO pdns.domains "
 				"(name, master, type) VALUES "
 				"('%s', %s, '%s')";
-			master = NULL;
 		}
 
 		if (!form_err) {
@@ -820,6 +821,7 @@ static void add_dns_domain(void)
 						hostmaster, reverse);
 
 			fcgx_p("Location: /overview/\r\n\r\n");
+			free(master);
 			goto out;
 		}
 	}
@@ -1052,7 +1054,6 @@ static void soa_record(void)
 	/* GET or unsuccessful POST */
 	if (!form_err) {
 		/* GET */
-		char *domain;
 		char *soa;
 		char *item;
 		char *htmp;
@@ -1061,8 +1062,7 @@ static void soa_record(void)
 				"pdns.domains WHERE pdns.domains.id = %d",
 				domain_id);
 		db_row = get_dbrow(res);
-		domain = strdupa(get_var(db_row, "domain"));
-		vl = add_html_var(vl, "domain", domain);
+		vl = add_html_var(vl, "domain", get_var(db_row, "domain"));
 		free_vars(db_row);
 		mysql_free_result(res);
 
@@ -1196,14 +1196,12 @@ static void ns_record(void)
 	/* GET or unsuccessful POST */
 	if (!form_err) {
 		/* GET */
-		char *domain;
-
 		res = sql_query(conn, "SELECT pdns.domains.name AS domain FROM "
 				"pdns.domains WHERE pdns.domains.id = %d",
 				domain_id);
 		db_row = get_dbrow(res);
-		domain = strdupa(get_var(db_row, "domain"));
-		vl = add_html_var(vl, "domain", domain);
+		vl = add_html_var(vl, "domain", get_var(db_row, "domain"));
+		domain = make_mysql_safe_string(get_var(db_row, "domain"));
 		free_vars(db_row);
 		mysql_free_result(res);
 
@@ -1322,14 +1320,12 @@ static void a_record(void)
 	/* GET or unsuccessful POST */
 	if (!form_err) {
 		/* GET */
-		char *domain;
-
 		res = sql_query(conn, "SELECT pdns.domains.name AS domain FROM "
 				"pdns.domains WHERE pdns.domains.id = %d",
 				domain_id);
 		db_row = get_dbrow(res);
-		domain = strdupa(get_var(db_row, "domain"));
-		vl = add_html_var(vl, "domain", domain);
+		vl = add_html_var(vl, "domain", get_var(db_row, "domain"));
+		domain = make_mysql_safe_string(get_var(db_row, "domain"));
 		free_vars(db_row);
 		mysql_free_result(res);
 
@@ -1451,14 +1447,12 @@ static void aaaa_record(void)
 	/* GET or unsuccessful POST */
 	if (!form_err) {
 		/* GET */
-		char *domain;
-
 		res = sql_query(conn, "SELECT pdns.domains.name AS domain FROM "
 				"pdns.domains WHERE pdns.domains.id = %d",
 				domain_id);
 		db_row = get_dbrow(res);
-		domain = strdupa(get_var(db_row, "domain"));
-		vl = add_html_var(vl, "domain", domain);
+		vl = add_html_var(vl, "domain", get_var(db_row, "domain"));
+		domain = make_mysql_safe_string(get_var(db_row, "domain"));
 		free_vars(db_row);
 		mysql_free_result(res);
 
@@ -1584,14 +1578,12 @@ static void cname_record(void)
 	/* GET or unsuccessful POST */
 	if (!form_err) {
 		/* GET */
-		char *domain;
-
 		res = sql_query(conn, "SELECT pdns.domains.name AS domain FROM "
 				"pdns.domains WHERE pdns.domains.id = %d",
 				domain_id);
 		db_row = get_dbrow(res);
-		domain = strdupa(get_var(db_row, "domain"));
-		vl = add_html_var(vl, "domain", domain);
+		vl = add_html_var(vl, "domain", get_var(db_row, "domain"));
+		domain = make_mysql_safe_string(get_var(db_row, "domain"));
 		free_vars(db_row);
 		mysql_free_result(res);
 
@@ -1713,14 +1705,12 @@ static void loc_record(void)
 	/* GET or unsuccessful POST */
 	if (!form_err) {
 		/* GET */
-		char *domain;
-
 		res = sql_query(conn, "SELECT pdns.domains.name AS domain FROM "
 				"pdns.domains WHERE pdns.domains.id = %d",
 				domain_id);
 		db_row = get_dbrow(res);
-		domain = strdupa(get_var(db_row, "domain"));
-		vl = add_html_var(vl, "domain", domain);
+		vl = add_html_var(vl, "domain", get_var(db_row, "domain"));
+		domain = make_mysql_safe_string(get_var(db_row, "domain"));
 		free_vars(db_row);
 		mysql_free_result(res);
 
@@ -1852,14 +1842,12 @@ static void mx_record(void)
 	/* GET or unsuccessful POST */
 	if (!form_err) {
 		/* GET */
-		char *domain;
-
 		res = sql_query(conn, "SELECT pdns.domains.name AS domain FROM "
 				"pdns.domains WHERE pdns.domains.id = %d",
 				domain_id);
 		db_row = get_dbrow(res);
-		domain = strdupa(get_var(db_row, "domain"));
-		vl = add_html_var(vl, "domain", domain);
+		vl = add_html_var(vl, "domain", get_var(db_row, "domain"));
+		domain = make_mysql_safe_string(get_var(db_row, "domain"));
 		free_vars(db_row);
 		mysql_free_result(res);
 
@@ -1984,14 +1972,12 @@ static void naptr_record(void)
 	/* GET or unsuccessful POST */
 	if (!form_err) {
 		/* GET */
-		char *domain;
-
 		res = sql_query(conn, "SELECT pdns.domains.name AS domain FROM "
 				"pdns.domains WHERE pdns.domains.id = %d",
 				domain_id);
 		db_row = get_dbrow(res);
-		domain = strdupa(get_var(db_row, "domain"));
-		vl = add_html_var(vl, "domain", domain);
+		vl = add_html_var(vl, "domain", get_var(db_row, "domain"));
+		domain = make_mysql_safe_string(get_var(db_row, "domain"));
 		free_vars(db_row);
 		mysql_free_result(res);
 
@@ -2112,14 +2098,12 @@ static void ptr_record(void)
 	/* GET or unsuccessful POST */
 	if (!form_err) {
 		/* GET */
-		char *domain;
-
 		res = sql_query(conn, "SELECT pdns.domains.name AS domain FROM "
 				"pdns.domains WHERE pdns.domains.id = %d",
 				domain_id);
 		db_row = get_dbrow(res);
-		domain = strdupa(get_var(db_row, "domain"));
-		vl = add_html_var(vl, "domain", domain);
+		vl = add_html_var(vl, "domain", get_var(db_row, "domain"));
+		domain = make_mysql_safe_string(get_var(db_row, "domain"));
 		free_vars(db_row);
 		mysql_free_result(res);
 
@@ -2241,14 +2225,12 @@ static void rp_record(void)
 	/* GET or unsuccessful POST */
 	if (!form_err) {
 		/* GET */
-		char *domain;
-
 		res = sql_query(conn, "SELECT pdns.domains.name AS domain FROM "
 				"pdns.domains WHERE pdns.domains.id = %d",
 				domain_id);
 		db_row = get_dbrow(res);
-		domain = strdupa(get_var(db_row, "domain"));
-		vl = add_html_var(vl, "domain", domain);
+		vl = add_html_var(vl, "domain", get_var(db_row, "domain"));
+		domain = make_mysql_safe_string(get_var(db_row, "domain"));
 		free_vars(db_row);
 		mysql_free_result(res);
 
@@ -2369,14 +2351,12 @@ static void spf_record(void)
 	/* GET or unsuccessful POST */
 	if (!form_err) {
 		/* GET */
-		char *domain;
-
 		res = sql_query(conn, "SELECT pdns.domains.name AS domain FROM "
 				"pdns.domains WHERE pdns.domains.id = %d",
 				domain_id);
 		db_row = get_dbrow(res);
-		domain = strdupa(get_var(db_row, "domain"));
-		vl = add_html_var(vl, "domain", domain);
+		vl = add_html_var(vl, "domain", get_var(db_row, "domain"));
+		domain = make_mysql_safe_string(get_var(db_row, "domain"));
 		free_vars(db_row);
 		mysql_free_result(res);
 
@@ -2498,14 +2478,12 @@ static void srv_record(void)
 	/* GET or unsuccessful POST */
 	if (!form_err) {
 		/* GET */
-		char *domain;
-
 		res = sql_query(conn, "SELECT pdns.domains.name AS domain FROM "
 				"pdns.domains WHERE pdns.domains.id = %d",
 				domain_id);
 		db_row = get_dbrow(res);
-		domain = strdupa(get_var(db_row, "domain"));
-		vl = add_html_var(vl, "domain", domain);
+		vl = add_html_var(vl, "domain", get_var(db_row, "domain"));
+		domain = make_mysql_safe_string(get_var(db_row, "domain"));
 		free_vars(db_row);
 		mysql_free_result(res);
 
@@ -2629,14 +2607,12 @@ static void txt_record(void)
 	/* GET or unsuccessful POST */
 	if (!form_err) {
 		/* GET */
-		char *domain;
-
 		res = sql_query(conn, "SELECT pdns.domains.name AS domain FROM "
 				"pdns.domains WHERE pdns.domains.id = %d",
 				domain_id);
 		db_row = get_dbrow(res);
-		domain = strdupa(get_var(db_row, "domain"));
-		vl = add_html_var(vl, "domain", domain);
+		vl = add_html_var(vl, "domain", get_var(db_row, "domain"));
+		domain = make_mysql_safe_string(get_var(db_row, "domain"));
 		free_vars(db_row);
 		mysql_free_result(res);
 
@@ -2718,7 +2694,7 @@ static void master_ns_ip(void)
 		if (!form_err) {
 			MYSQL *sconn;
 			char *domain = make_mysql_safe_string(qvar("domain"));
-			const char *o_mip = qvar("o_mip");
+			char *o_mip = make_mysql_safe_string(qvar("o_mip"));
 			const char *u_sql = "UPDATE pdns.domains SET "
 				"master = '%s' WHERE name = '%s' AND "
 				"master = '%s'";
@@ -2729,6 +2705,7 @@ static void master_ns_ip(void)
 			sql_query(sconn, u_sql, ip, domain, o_mip);
 			mysql_close(sconn);
 			free(domain);
+			free(o_mip);
 
 			fcgx_p("Location: /records/?domain_id=%d&type=soa"
 					"\r\n\r\n", domain_id);
@@ -2739,14 +2716,11 @@ static void master_ns_ip(void)
 	/* GET or unsuccessful POST */
 	if (!form_err) {
 		/* GET */
-		char *domain;
-
 		res = sql_query(conn, "SELECT name AS domain, master FROM "
 				"pdns.domains WHERE domains.id = %d",
 				domain_id);
 		db_row = get_dbrow(res);
-		domain = strdupa(get_var(db_row, "domain"));
-		vl = add_html_var(vl, "domain", domain);
+		vl = add_html_var(vl, "domain", get_var(db_row, "domain"));
 		vl = add_html_var(vl, "dax_mip", get_var(db_row, "master"));
 		vl = add_html_var(vl, "o_mip", get_var(db_row, "master"));
 		free_vars(db_row);
@@ -3182,7 +3156,7 @@ static void mail_fwd_record(void)
 
 		if (!form_err) {
 			MYSQL *mconn;
-			const char *o_src = qvar("o_src");
+			char *o_src = make_mysql_safe_string(qvar("o_src"));
 			const char *u_fwd_sql = "UPDATE postfix.forwarding SET "
 				"source = '%s@%s', destination = '%s' WHERE "
 				"domain_id = %d AND source = '%s'";
@@ -3204,6 +3178,7 @@ static void mail_fwd_record(void)
 						domain, dst);
 			}
 			mysql_close(mconn);
+			free(o_src);
 
 			fcgx_p("Location: /mail_forwarding/?domain_id=%d"
 					"\r\n\r\n", domain_id);
@@ -3214,13 +3189,11 @@ static void mail_fwd_record(void)
 	/* GET or unsuccessful POST */
 	if (!form_err) {
 		/* GET */
-		char *domain;
-
 		res = sql_query(conn, "SELECT domain FROM mail_domains WHERE "
 				"domain_id = %d", domain_id);
 		db_row = get_dbrow(res);
-		domain = strdupa(get_var(db_row, "domain"));
-		vl = add_html_var(vl, "domain", domain);
+		vl = add_html_var(vl, "domain", get_var(db_row, "domain"));
+		domain = make_mysql_safe_string(get_var(db_row, "domain"));
 		free_vars(db_row);
 		mysql_free_result(res);
 
@@ -3849,7 +3822,6 @@ out:
 static void activate_account(void)
 {
 	bool form_err = false;
-	char *name = NULL;
 	char *key = NULL;
 	MYSQL_RES *res;
 	MYSQL_ROW row;
@@ -3857,9 +3829,6 @@ static void activate_account(void)
 	TMPL_fmtlist *fmtlist = NULL;
 
 	if (IS_POST()) {
-		name = make_mysql_safe_string(qvar("dax_name"));
-		key = make_mysql_safe_string(qvar("key"));
-
 		if (!IS_SET(qvar("dax_name"))) {
 			vl = add_html_var(vl, "name_error", "yes");
 			form_err = true;
@@ -3882,7 +3851,9 @@ static void activate_account(void)
 			unsigned int uid;
 			char *password;
 			char *email;
+			char *name;
 
+			key = make_mysql_safe_string(qvar("key"));
 			res = sql_query(conn, "SELECT email FROM "
 					"pending_activations WHERE akey = "
 					"'%s'", key);
@@ -3890,6 +3861,8 @@ static void activate_account(void)
 				goto out;
 			row = mysql_fetch_row(res);
 			email = make_mysql_safe_string(row[0]);
+			name = make_mysql_safe_string(qvar("dax_name"));
+
 			mysql_free_result(res);
 
 			/* We need to be sure a new uid isn't inserted here */
@@ -3919,6 +3892,7 @@ static void activate_account(void)
 			fcgx_p("Location: /activate_account/?activated=yes"
 					"\r\n\r\n");
 			free(email);
+			free(name);
 			goto out;
 		}
 	}
@@ -3926,8 +3900,9 @@ static void activate_account(void)
 	if (IS_SET(qvar("activated"))) {
 		vl = add_html_var(vl, "activated", "yes");
 	} else {
+		key = make_mysql_safe_string(qvar("key"));
 		res = sql_query(conn, "SELECT email FROM pending_activations "
-				"WHERE akey = '%s'", qvar("key"));
+				"WHERE akey = '%s'", key);
 		if (!mysql_num_rows(res)) {
 			vl = add_html_var(vl, "no_key", "yes");
 			form_err = true;
@@ -3945,7 +3920,6 @@ static void activate_account(void)
 	TMPL_free_fmtlist(fmtlist);
 out:
 	TMPL_free_varlist(vl);
-	free(name);
 	free(key);
 }
 
@@ -3958,6 +3932,7 @@ static void reset_password(void)
 {
 	bool form_err = false;
 	char *email = NULL;
+	char *key = NULL;
 	MYSQL_RES *res;
 	MYSQL_ROW row;
 	TMPL_varlist *vl = NULL;
@@ -3997,7 +3972,6 @@ static void reset_password(void)
 
 		if (!form_err) {
 			char *password;
-			char *key;
 
 			key = make_mysql_safe_string(qvar("key"));
 			res = sql_query(conn, "SELECT email FROM "
@@ -4017,7 +3991,6 @@ static void reset_password(void)
 					email);
 			sql_query(conn, "DELETE FROM pending_activations "
 					"WHERE akey = '%s'", key);
-			free(key);
 
 			vl = add_html_var(vl, "reset", "yes");
 		}
@@ -4026,8 +3999,9 @@ static void reset_password(void)
 	if (IS_GET() && IS_SET(qvar("reset"))) {
 		vl = add_html_var(vl, "reset", "yes");
 	} else if (IS_GET() && IS_SET(qvar("key"))) {
+		key = make_mysql_safe_string(qvar("key"));
 		res = sql_query(conn, "SELECT email FROM pending_activations "
-				"WHERE akey = '%s'", qvar("key"));
+				"WHERE akey = '%s'", key);
 		if (!mysql_num_rows(res)) {
 			vl = add_html_var(vl, "valid_key", "no");
 		} else {
@@ -4045,6 +4019,7 @@ static void reset_password(void)
 out:
 	TMPL_free_varlist(vl);
 	free(email);
+	free(key);
 }
 
 /*
@@ -4077,16 +4052,16 @@ static void disable_ipacl(void)
 		}
 	} else if (IS_GET() && IS_SET(qvar("key"))) {
 		MYSQL_RES *res;
+		char *key = make_mysql_safe_string(qvar("key"));
 
 		res = sql_query(conn, "SELECT email, passwd.uid FROM "
 				"pending_ipacl_deact, passwd WHERE "
 				"pending_ipacl_deact.dkey = '%s' AND "
 				"passwd.username = pending_ipacl_deact.email",
-				qvar("key"));
+				key);
 		if (!mysql_num_rows(res)) {
 			vl = add_html_var(vl, "valid_key", "no");
 		} else {
-			char *key = make_mysql_safe_string(qvar("key"));
 			MYSQL_ROW row = mysql_fetch_row(res);
 			unsigned int uid = strtoul(row[1], NULL, 10);
 
@@ -4094,12 +4069,12 @@ static void disable_ipacl(void)
 					"uid = %u", uid);
 			sql_query(conn, "DELETE FROM pending_ipacl_deact "
 					"WHERE dkey = '%s'", key);
-			free(key);
 
 			vl = add_html_var(vl, "email_addr", row[0]);
 			vl = add_html_var(vl, "valid_key", "yes");
 		}
 		mysql_free_result(res);
+		free(key);
 	}
 
 	fmtlist = TMPL_add_fmt(fmtlist, "de_xss", de_xss);
