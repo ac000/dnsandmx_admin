@@ -164,6 +164,9 @@ bool is_reverse_zone(const char *domain)
  */
 bool is_valid_ipv6_addr(const char *addr)
 {
+	if (!strchr(addr, ':'))
+		return false;
+
 	while (*addr) {
 		if (!isxdigit(*addr) && *addr != ':')
 			return false;
