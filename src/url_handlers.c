@@ -80,6 +80,7 @@ static void login(void)
 	if (ret == -3)
 		vl = add_html_var(vl, "ipacl", env_vars.remote_addr);
 	vl = add_html_var(vl, "www_host", WWW_HOST);
+	vl = add_html_var(vl, "rip", env_vars.remote_addr);
 
 	fmtlist = TMPL_add_fmt(fmtlist, "de_xss", de_xss);
 	send_template("templates/login.tmpl", vl, fmtlist);
