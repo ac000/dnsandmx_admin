@@ -78,7 +78,7 @@ static void login(void)
 	if (ret == -2)
 		vl = add_html_var(vl, "enabled", "no");
 	if (ret == -3)
-		vl = add_html_var(vl, "ipacl", env_vars.remote_addr);
+		vl = add_html_var(vl, "ipacl", "denied");
 	vl = add_html_var(vl, "www_host", WWW_HOST);
 	vl = add_html_var(vl, "rip", env_vars.remote_addr);
 
