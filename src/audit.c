@@ -93,6 +93,8 @@ static int match_ipv4(const char *ip, const char *network, unsigned short cidr)
 static int check_ip_acl(void)
 {
 	int ret = -1;
+	int entries = 0;
+	int skipped = 0;
 	char *username;
 	char *token;
 	char *acl;
@@ -117,6 +119,12 @@ static int check_ip_acl(void)
 	acl = strdup(row[2]);
 	token = strtok(acl, " ");
 	while (token) {
+		entries++;
+		if (token[0] == '#') {
+			/* Entry commented out */
+			skipped++;
+			goto skip;
+		}
 		if (!strchr(token, '/')) {
 			if (strcmp(token, rip) == 0) {
 				ret = 0;
@@ -137,10 +145,14 @@ static int check_ip_acl(void)
 				break;
 			}
 		}
+skip:
 		token = strtok(NULL, " ");
 	}
 	free(acl);
 
+	/* If all entries are commented out, carry on with auth check */
+	if (skipped == entries)
+		ret = 0;
 out:
 	mysql_free_result(res);
 	free(username);
