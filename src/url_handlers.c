@@ -682,8 +682,8 @@ static void __add_default_dns_records(unsigned long long id,
 
 	/* SOA Record */
 	sql_query(conn, "INSERT INTO %s (%s) VALUES "
-			"(%llu, '%s', 'SOA', '%s %s 0 10800 3600 604800 900', "
-			"3600, %d)",
+			"(%llu, '%s', 'SOA', '%s %s 0 10800 3600 1209600 "
+			"900', 3600, %d)",
 			rdb, rfields, id, domain, PRIMARY_NS, hostmaster,
 			chtime);
 
