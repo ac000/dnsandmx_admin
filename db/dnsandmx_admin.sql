@@ -104,6 +104,7 @@ CREATE TABLE `passwd` (
   `capabilities` smallint(5) unsigned NOT NULL DEFAULT '0',
   `enabled` tinyint(1) NOT NULL DEFAULT '0',
   `d_reason` varchar(255) NOT NULL,
+  `created` int(10) unsigned NOT NULL,
   UNIQUE KEY `uid` (`uid`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -192,4 +193,4 @@ CREATE TABLE `utmp` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-04-15 18:54:04
+-- Dump completed on 2014-05-30 17:26:18
