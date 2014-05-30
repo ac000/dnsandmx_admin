@@ -177,6 +177,7 @@ CREATE TABLE `utmp` (
   `username` varchar(255) NOT NULL,
   `ip` varchar(39) NOT NULL,
   `hostname` varchar(255) NOT NULL,
+  `port` int(5) NOT NULL,
   `sid` bigint(20) unsigned NOT NULL,
   UNIQUE KEY `sid` (`sid`),
   KEY `uid` (`uid`),
@@ -193,4 +194,4 @@ CREATE TABLE `utmp` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-05-30 17:26:18
+-- Dump completed on 2014-05-30 18:25:30
