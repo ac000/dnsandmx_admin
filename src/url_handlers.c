@@ -3279,7 +3279,6 @@ static void paypal_ipn(void)
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)response);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
-	curl_easy_perform(curl);
 	ret = curl_easy_perform(curl);
 	if (ret != CURLE_OK)
 		d_fprintf(error_log, "curl_easy_perform() failed: %s\n",
