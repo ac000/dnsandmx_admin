@@ -82,6 +82,7 @@ static int match_ipv4(const char *ip, const char *network, unsigned short cidr)
 	else
 		return -1;
 }
+
 /*
  * Checks if a login is allowed from the current IP address of the user
  * against their IP ACL, if they have IP access control enabled.
