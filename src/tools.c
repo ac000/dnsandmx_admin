@@ -53,7 +53,7 @@ void dump_dns_domain_to_bind(int domain_id)
 	def_ttl = strdupa(get_var(db_row, "ttl"));
 	fprintf(out, "$TTL %s\n", def_ttl);
 	soa_bits = g_strsplit(get_var(db_row, "content"), " ", 0);
-	fprintf(out, "@\tIN\tSOA\t%s%s %s%s {\n",
+	fprintf(out, "@\tIN\tSOA\t%s%s %s%s (\n",
 		soa_bits[0],
 		(soa_bits[0][strlen(soa_bits[0]) - 1] == '.') ? "" : ".",
 		soa_bits[1],
@@ -78,7 +78,7 @@ void dump_dns_domain_to_bind(int domain_id)
 	fprintf(out, "\t\t\t%s\n", soa_bits[3]);
 	fprintf(out, "\t\t\t%s\n", soa_bits[4]);
 	fprintf(out, "\t\t\t%s\n", soa_bits[5]);
-	fprintf(out, "\t\t\t%s }\n", soa_bits[6]);
+	fprintf(out, "\t\t\t%s )\n", soa_bits[6]);
 	g_strfreev(soa_bits);
 	free_vars(db_row);
 
