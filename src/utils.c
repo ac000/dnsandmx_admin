@@ -1315,7 +1315,7 @@ void get_page_pagination(const char *req_page_no, int rpp, int *page_no,
 void do_pagination(TMPL_varlist *varlist, int page, int nr_pages)
 {
 	if (IS_MULTI_PAGE(nr_pages)) {
-		char page_no[10];
+		char page_no[12];
 
 		if (!IS_FIRST_PAGE(page)) {
 			snprintf(page_no, sizeof(page_no), "%d", page - 1);
