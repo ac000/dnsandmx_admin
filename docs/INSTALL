@@ -12,7 +12,7 @@ Requirements
 To build you will need at least the following (older versions may work)
 
     glib2{-devel}-2.22.5
-    gmime{-devel}-2.2.26
+    gmime{-devel}-2.6.23
     mhash{-devel}-0.9.9.9
     mysql{-devel}-5.1.69
     fcgi{-devel}-2.4.0
