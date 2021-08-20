@@ -10,6 +10,8 @@
  * See AGPL-3.0.txt
  */
 
+#define _GNU_SOURCE	1
+
 #include <stdlib.h>
 #include <stdarg.h>
 #include <sys/types.h>
