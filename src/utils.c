@@ -568,6 +568,7 @@ void free_u_files(void)
 		unlink(file_info->temp_file_name);
 		free(file_info->name);
 		free(file_info->mime_type);
+		free(file_info);
 	}
 	g_list_free(u_files);
 }
