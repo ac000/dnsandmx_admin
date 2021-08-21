@@ -450,7 +450,7 @@ void display_last_login(TMPL_varlist *varlist, bool utc)
 		strftime(tbuf, 32, "%a %b %e %H:%M %Y", utc ? gmtime(&login) :
 				localtime(&login));
 		varlist = add_html_var(varlist, "last_login", tbuf);
-		varlist = add_html_var(varlist, "last_login_from", host);
+		add_html_var(varlist, "last_login_from", host);
 	}
 }
 

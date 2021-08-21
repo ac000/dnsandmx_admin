@@ -1317,17 +1317,16 @@ void do_pagination(TMPL_varlist *varlist, int page, int nr_pages)
 
 		if (!IS_FIRST_PAGE(page)) {
 			snprintf(page_no, sizeof(page_no), "%d", page - 1);
-			varlist = TMPL_add_var(varlist, "prev_page", page_no,
-					(char *)NULL);
+			TMPL_add_var(varlist, "prev_page", page_no,
+				     (char *)NULL);
 		}
 		if (!IS_LAST_PAGE(page, nr_pages)) {
 			snprintf(page_no, sizeof(page_no), "%d", page + 1);
-			varlist = TMPL_add_var(varlist, "next_page", page_no,
-					(char *)NULL);
+			TMPL_add_var(varlist, "next_page", page_no,
+				     (char *)NULL);
 		}
 	} else {
-		varlist = TMPL_add_var(varlist, "no_pages", "true",
-				(char *)NULL);
+		TMPL_add_var(varlist, "no_pages", "true", (char *)NULL);
 	}
 }
 
