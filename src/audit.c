@@ -304,7 +304,6 @@ static void *log_utmp_host(void *arg)
 	struct sockaddr *addr = (struct sockaddr *)&addr4;
 	struct utmp_info *ui = (struct utmp_info *)arg;
 	socklen_t addr_len = sizeof(addr4);
-	MYSQL *db;
 
 	if (!strchr(ui->ip, ':')) {
 		/* IPv4 */
@@ -320,11 +319,15 @@ static void *log_utmp_host(void *arg)
 	}
 	getnameinfo(addr, addr_len, host, NI_MAXHOST, NULL, 0, 0);
 
-	db = db_conn(db_host, db_name, false);
+	/*
+	 * Set the TLS conn variable so the subsequent
+	 * make_mysql_safe_string() will work.
+	 */
+	conn = db_conn(db_host, db_name, false);
 	hostname = make_mysql_safe_string(host);
-	sql_query(db, "UPDATE utmp SET hostname = '%s' WHERE sid = %llu",
-			hostname, ui->sid);
-	mysql_close(db);
+	sql_query(conn, "UPDATE utmp SET hostname = '%s' WHERE sid = %llu",
+		  hostname, ui->sid);
+	mysql_close(conn);
 	free(hostname);
 	free(ui);
 

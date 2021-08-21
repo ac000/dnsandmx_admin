@@ -23,8 +23,13 @@
 #include "utils.h"
 #include "db.h"
 
-/* Global MySQL connection handles */
-MYSQL *conn;
+/*
+ * Global (thread local) MySQL connection handles
+ *
+ * The reason this is using Thread Local Storage TLS) is down to
+ * the log_utmp_host() thread for handling delayed host lookups.
+ */
+__thread MYSQL *conn;
 
 char *db_socket_name = NULL;
 unsigned int db_port_num = 3306;
