@@ -3414,8 +3414,8 @@ static void renew(void)
 		"'OUT', '%s', %ld.%06ld)";
 	const char *dtable;
 	char *domain;
-	char f_remain[10];
-	char funds[10];
+	char f_remain[16];
+	char funds[16];
 	char nexpire[11];
 	double amount;
 	time_t n_expires;
