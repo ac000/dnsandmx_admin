@@ -21,7 +21,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <time.h>
-#include <alloca.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <stdbool.h>
@@ -773,10 +772,11 @@ static void add_dns_domain(void)
 			form_err = true;
 			vl = add_html_var(vl, "hostmaster_error", "true");
 		}
-		htmp = alloca(strlen(qvar("dax_hostmaster")) * 2 + 1);
+		htmp = malloc(strlen(qvar("dax_hostmaster")) * 2 + 1);
 		email_to_hostmaster(qvar("dax_hostmaster"), htmp);
 		hostmaster = make_mysql_safe_string(htmp);
 		dotchomp(hostmaster);
+		free(htmp);
 
 		/*
 		 * If we are to be a slave for this domain, we need the
@@ -1037,10 +1037,11 @@ static void soa_record(void)
 			form_err = true;
 			vl = add_html_var(vl, "hostmaster_error", "true");
 		}
-		htmp = alloca(strlen(qvar("dax_hostmaster")) * 2 + 1);
+		htmp = malloc(strlen(qvar("dax_hostmaster")) * 2 + 1);
 		email_to_hostmaster(qvar("dax_hostmaster"), htmp);
 		hostmaster = make_mysql_safe_string(htmp);
 		dotchomp(hostmaster);
+		free(htmp);
 
 		if (!is_valid_hostname(pns)) {
 			form_err = true;
@@ -1100,9 +1101,10 @@ static void soa_record(void)
 		item = strsep(&soa, " ");
 
 		/* Display hostmaster address as email address */
-		htmp = alloca(strlen(item) + 1);
+		htmp = malloc(strlen(item) + 1);
 		vl = add_html_var(vl, "dax_hostmaster",
 			hostmaster_to_email(item, htmp));
+		free(htmp);
 
 		item = strsep(&soa, " "); /* not showing serial here */
 		item = strsep(&soa, " ");
