@@ -3416,7 +3416,7 @@ static void renew(void)
 	char *domain;
 	char f_remain[16];
 	char funds[16];
-	char nexpire[11];
+	char nexpire[21];
 	double amount;
 	time_t n_expires;
 	GHashTable *db_row = NULL;
