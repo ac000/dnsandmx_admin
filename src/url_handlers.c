@@ -1106,7 +1106,7 @@ static void soa_record(void)
 			hostmaster_to_email(item, htmp));
 		free(htmp);
 
-		item = strsep(&soa, " "); /* not showing serial here */
+		strsep(&soa, " "); /* not showing serial here */
 		item = strsep(&soa, " ");
 		vl = add_html_var(vl, "dax_refresh", item);
 		item = strsep(&soa, " ");
