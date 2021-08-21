@@ -613,6 +613,7 @@ static void issue_etrn(void)
 	struct addrinfo hints;
 	struct addrinfo *res;
 	ssize_t bytes_read;
+	ssize_t bytes_wrote;
 	char buf[BUF_SIZE];
 	bool err = true;
 
@@ -644,7 +645,12 @@ static void issue_etrn(void)
 
 	/* Send HELO */
 	len = snprintf(buf, sizeof(buf), "HELO %s\r\n", db_host);
-	write(sockfd, buf, len);
+	bytes_wrote = write(sockfd, buf, len);
+	if (bytes_wrote < len) {
+		d_fprintf(error_log, "Error issuing HELO to %s:25\n",
+			  db_shost);
+		goto out;
+	}
 	bytes_read = read(sockfd, buf, BUF_SIZE);
 	buf[bytes_read - 2] = '\0';
 
@@ -652,15 +658,21 @@ static void issue_etrn(void)
 
 	/* Issue ETRN */
 	len = snprintf(buf, sizeof(buf), "ETRN %s\r\n", domain);
-	write(sockfd, buf, len);
-	bytes_read = read(sockfd, buf, BUF_SIZE);
-	buf[bytes_read - 2] = '\0';
-	if (!strstr(buf, "250 ")) {
+	bytes_wrote = write(sockfd, buf, len);
+	if (bytes_wrote < len) {
 		d_fprintf(error_log, "Error issuing ETRN for %s\n", domain);
 		goto out;
 	}
+	bytes_read = read(sockfd, buf, BUF_SIZE);
+	buf[bytes_read - 2] = '\0';
+	if (!strstr(buf, "250 ")) {
+		d_fprintf(error_log, "Error in ETRN for %s\n", domain);
+		goto out;
+	}
 
-	write(sockfd, "QUIT\r\n", 6);
+	bytes_wrote = write(sockfd, "QUIT\r\n", 6);
+	if (bytes_wrote < 6)
+		d_fprintf(error_log, "Error issuing QUIT to %s\n", db_shost);
 	err = false;
 
 out:
