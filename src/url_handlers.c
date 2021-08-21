@@ -3267,7 +3267,7 @@ static void paypal_ipn(void)
 	char *txn_sub_st;
 	char *paypal_addr;
 	const char *direction;
-	char url[BUF_SIZE];
+	char url[BUF_SIZE * 2];
 	int ret;
 	unsigned int uid;
 	double amount;
