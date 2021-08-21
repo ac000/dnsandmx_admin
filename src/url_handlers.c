@@ -190,14 +190,14 @@ static void __update_user_settings(void)
 	if (IS_SET(qvar("dax_pass1"))) {
 		hash = generate_password_hash(SHA512, qvar("dax_pass1"));
 	} else {
-		MYSQL_RES *res;
+		MYSQL_RES *mres;
 		MYSQL_ROW row;
 
-		res = sql_query(conn, "SELECT password FROM passwd WHERE "
+		mres = sql_query(conn, "SELECT password FROM passwd WHERE "
 				"uid = %u", user_session.uid);
-		row = mysql_fetch_row(res);
+		row = mysql_fetch_row(mres);
 		hash = row[0];
-		mysql_free_result(res);
+		mysql_free_result(mres);
 	}
 
 	username = make_mysql_safe_string(qvar("dax_email1"));
@@ -3961,14 +3961,14 @@ static void reset_password(void)
 			vl = add_html_var(vl, "email", qvar("email_addr"));
 			vl = add_html_var(vl, "no_user", "yes");
 		} else {
-			char key[SHA1_LEN + 1];
+			char skey[SHA1_LEN + 1];
 
 			email = make_mysql_safe_string(qvar("email_addr"));
-			generate_hash(key, SHA1);
+			generate_hash(skey, SHA1);
 			sql_query(conn, "REPLACE INTO pending_activations "
-					"VALUES ('%s', '%s', %ld)", email, key,
-					time(NULL) + 86400);
-			send_reset_password_mail(qvar("email_addr"), key);
+				  "VALUES ('%s', '%s', %ld)", email, skey,
+				  time(NULL) + 86400);
+			send_reset_password_mail(qvar("email_addr"), skey);
 			vl = add_html_var(vl, "email_sent", "yes");
 			vl = add_html_var(vl, "email", qvar("email_addr"));
 		}
