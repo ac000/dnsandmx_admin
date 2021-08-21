@@ -291,19 +291,19 @@ static void check_dns_domain_expiry(void)
 	unsigned long i;
 	unsigned long nr_rows;
 	time_t tnow = time(NULL);
-	MYSQL *conn;
+	MYSQL *mc;
 	MYSQL_RES *res;
 
 	d_fprintf(debug_log, "Looking for expired DNS domains\n");
 
-	conn = db_conn(db_host, db_name, false);
+	mc = db_conn(db_host, db_name, false);
 	/*
 	 * Get a list of DNS domains that are due to expire within 30 days.
 	 *
 	 * We need to cast the expires calculation to a signed value to cater
 	 * for -ve results when the current time is beyond the expiry date.
 	 */
-	res = sql_query(conn, "SELECT passwd.name, passwd.username AS email, "
+	res = sql_query(mc, "SELECT passwd.name, passwd.username AS email, "
 			"pdns.domains.name AS domain, pdns.domains.type, "
 			"domain_id, added, expires, notified FROM domains "
 			"INNER JOIN pdns.domains ON "
@@ -333,9 +333,9 @@ static void check_dns_domain_expiry(void)
 			const char *r_sql = "UPDATE pdns.records SET name = "
 				"CONCAT(\"!!\", name) WHERE domain_id = %d";
 
-			sql_query(conn, "UPDATE domains SET expired = 1 WHERE "
+			sql_query(mc, "UPDATE domains SET expired = 1 WHERE "
 					"domain_id = %d", domain_id);
-			sql_query(conn, r_sql, domain_id);
+			sql_query(mc, r_sql, domain_id);
 
 			sconn = db_conn(db_shost, "pdns", true);
 			sql_query(sconn, r_sql, domain_id);
@@ -344,7 +344,7 @@ static void check_dns_domain_expiry(void)
 					"master = CONCAT(\"!!\", master) WHERE "
 					"id = %d";
 
-				sql_query(conn, s_sql, domain_id);
+				sql_query(mc, s_sql, domain_id);
 				sql_query(sconn, s_sql, domain_id);
 			}
 			mysql_close(sconn);
@@ -359,7 +359,7 @@ static void check_dns_domain_expiry(void)
 						get_var(db_row, "email"),
 						get_var(db_row, "domain"),
 						"DNS", texpires);
-				sql_query(conn, "UPDATE domains SET notified "
+				sql_query(mc, "UPDATE domains SET notified "
 						"= 1 WHERE domain_id = %d",
 						domain_id);
 			}
@@ -368,7 +368,7 @@ static void check_dns_domain_expiry(void)
 						get_var(db_row, "email"),
 						get_var(db_row, "domain"),
 						"DNS", texpires);
-				sql_query(conn, "UPDATE domains SET notified "
+				sql_query(mc, "UPDATE domains SET notified "
 						"= 1 WHERE domain_id = %d",
 						domain_id);
 		}
@@ -376,7 +376,7 @@ static void check_dns_domain_expiry(void)
 	}
 
 	mysql_free_result(res);
-	mysql_close(conn);
+	mysql_close(mc);
 }
 
 static void check_mail_domain_expiry(void)
@@ -384,19 +384,19 @@ static void check_mail_domain_expiry(void)
 	unsigned long i;
 	unsigned long nr_rows;
 	time_t tnow = time(NULL);
-	MYSQL *conn;
+	MYSQL *mc;
 	MYSQL_RES *res;
 
 	d_fprintf(debug_log, "Looking for expired Mail domains\n");
 
-	conn = db_conn(db_host, db_name, false);
+	mc = db_conn(db_host, db_name, false);
 	/*
 	 * Get a list of Mail domains that are due to expire within 30 days.
 	 *
 	 * We need to cast the expires calculation to a signed value to cater
 	 * for -ve results when the current time is beyond the expiry date.
 	 */
-	res = sql_query(conn, "SELECT passwd.name, passwd.username AS email, "
+	res = sql_query(mc, "SELECT passwd.name, passwd.username AS email, "
 			"domain, domain_id, type, added, expires, notified "
 			"FROM mail_domains INNER JOIN passwd ON "
 			"(passwd.uid = mail_domains.uid) WHERE expired = 0 "
@@ -425,7 +425,7 @@ static void check_mail_domain_expiry(void)
 			/* Domain has expired */
 			MYSQL *sconn;
 
-			sql_query(conn, "UPDATE mail_domains SET expired = 1 "
+			sql_query(mc, "UPDATE mail_domains SET expired = 1 "
 					"WHERE domain_id = %d", domain_id);
 
 			sconn = db_conn(db_shost, "postfix", true);
@@ -439,7 +439,7 @@ static void check_mail_domain_expiry(void)
 					"postfix.local_domains SET enabled = 0 "
 					"WHERE domain_id = %d";
 
-				sql_query(conn, f_sql, domain_id);
+				sql_query(mc, f_sql, domain_id);
 				sql_query(sconn, f_sql, domain_id);
 			}
 			mysql_close(sconn);
@@ -454,7 +454,7 @@ static void check_mail_domain_expiry(void)
 						get_var(db_row, "email"),
 						get_var(db_row, "domain"),
 						"Mail", texpires);
-				sql_query(conn, "UPDATE mail_domains SET "
+				sql_query(mc, "UPDATE mail_domains SET "
 						"notified = 1 WHERE domain_id "
 						"= %d", domain_id);
 			}
@@ -463,7 +463,7 @@ static void check_mail_domain_expiry(void)
 						get_var(db_row, "email"),
 						get_var(db_row, "domain"),
 						"Mail", texpires);
-				sql_query(conn, "UPDATE mail_domains SET "
+				sql_query(mc, "UPDATE mail_domains SET "
 						"notified = 1 WHERE domain_id "
 						"= %d", domain_id);
 		}
@@ -471,27 +471,27 @@ static void check_mail_domain_expiry(void)
 	}
 
 	mysql_free_result(res);
-	mysql_close(conn);
+	mysql_close(mc);
 }
 
 static void clear_pending_activations(void)
 {
-	MYSQL *conn;
+	MYSQL *mc;
 
-	conn = db_conn(db_host, db_name, false);
-	sql_query(conn, "DELETE FROM pending_activations WHERE %ld > expires",
-			time(NULL));
-	mysql_close(conn);
+	mc = db_conn(db_host, db_name, false);
+	sql_query(mc, "DELETE FROM pending_activations WHERE %ld > expires",
+		  time(NULL));
+	mysql_close(mc);
 }
 
 static void clear_pending_ipacl_deact(void)
 {
-	MYSQL *conn;
+	MYSQL *mc;
 
-	conn = db_conn(db_host, db_name, false);
-	sql_query(conn, "DELETE FROM pending_ipacl_deact WHERE %ld > expires",
-			time(NULL));
-	mysql_close(conn);
+	mc = db_conn(db_host, db_name, false);
+	sql_query(mc, "DELETE FROM pending_ipacl_deact WHERE %ld > expires",
+		  time(NULL));
+	mysql_close(mc);
 }
 
 static void house_keeping(void)

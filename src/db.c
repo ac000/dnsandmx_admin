@@ -78,7 +78,7 @@ MYSQL *db_conn(const char *host, const char *db, bool ssl)
  * This function will either return a result set or NULL. Note that some
  * queries don't return result sets by design.
  */
-MYSQL_RES *__sql_query(MYSQL *conn, const char *func, const char *fmt, ...)
+MYSQL_RES *__sql_query(MYSQL *mc, const char *func, const char *fmt, ...)
 {
 	va_list args;
 	char sql[SQL_MAX];
@@ -101,6 +101,6 @@ MYSQL_RES *__sql_query(MYSQL *conn, const char *func, const char *fmt, ...)
 		fflush(sql_log);
 	}
 
-	mysql_real_query(conn, sql, len);
-	return mysql_store_result(conn);
+	mysql_real_query(mc, sql, len);
+	return mysql_store_result(mc);
 }
