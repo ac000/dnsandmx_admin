@@ -3379,7 +3379,7 @@ static void add_funds(void)
 		if (form_err) {
 			vl = add_html_var(vl, "dax_amount", qvar("dax_amount"));
 		} else {
-			char amnt[11];
+			char amnt[14];
 
 			snprintf(amnt, sizeof(amnt), "%d.00", amount);
 			vl = add_html_var(vl, "dax_amount", amnt);
