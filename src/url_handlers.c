@@ -3923,7 +3923,6 @@ static void activate_account(void)
 				"WHERE akey = '%s'", key);
 		if (!mysql_num_rows(res)) {
 			vl = add_html_var(vl, "no_key", "yes");
-			form_err = true;
 		} else {
 			row = mysql_fetch_row(res);
 			vl = add_html_var(vl, "email_addr", row[0]);
