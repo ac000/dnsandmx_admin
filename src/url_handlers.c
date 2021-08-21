@@ -81,7 +81,7 @@ static void login(void)
 		vl = add_html_var(vl, "enabled", "no");
 	if (ret == -3)
 		vl = add_html_var(vl, "ipacl", "denied");
-	vl = add_html_var(vl, "www_host", WWW_HOST);
+	vl = add_html_var(vl, "www_host", cfg->www_host);
 	vl = add_html_var(vl, "rip", env_vars.remote_addr);
 
 	fmtlist = TMPL_add_fmt(fmtlist, "de_xss", de_xss);
@@ -109,7 +109,7 @@ static void logout(void)
 	TMPL_fmtlist *fmtlist = NULL;
 
 	tdb = tctdbnew();
-	tctdbopen(tdb, SESSION_DB, TDBOWRITER);
+	tctdbopen(tdb, cfg->session_db, TDBOWRITER);
 
 	qry = tctdbqrynew(tdb);
 	tctdbqryaddcond(qry, "session_id", TDBQCSTREQ,
@@ -129,7 +129,7 @@ static void logout(void)
 				"expires=Thu, 01 Jan 1970 00:00:01 GMT; "
 				"path=/; httponly\r\n");
 
-	vl = add_html_var(vl, "www_host", WWW_HOST);
+	vl = add_html_var(vl, "www_host", cfg->www_host);
 
         fmtlist = TMPL_add_fmt(fmtlist, "de_xss", de_xss);
 	send_template("templates/logout.tmpl", vl, fmtlist);
@@ -223,7 +223,7 @@ static void __update_user_settings(void)
 	 * the old session first then storing the updated session.
 	 */
 	tdb = tctdbnew();
-	tctdbopen(tdb, SESSION_DB, TDBOREADER | TDBOWRITER);
+	tctdbopen(tdb, cfg->session_db, TDBOREADER | TDBOWRITER);
 
 	snprintf(uid, sizeof(uid), "%u", user_session.uid);
 	qry = tctdbqrynew(tdb);
@@ -429,7 +429,7 @@ static void add_mail_domain(void)
 
 		if (!form_err && strcmp(m_type, "MX") == 0) {
 			/* Backup MX */
-			mconn = db_conn(db_shost, "postfix", true);
+			mconn = db_conn(cfg->db_shost, "postfix", true);
 			sql_query(mconn, "INSERT INTO postfix.relay_domains "
 					"(domain_id, domain) VALUES (%llu, "
 					"'%s')", id, domain);
@@ -456,7 +456,7 @@ static void add_mail_domain(void)
 			sql_query(conn, fwd_sql, id, "MAILER-DAEMON", domain,
 					user_session.username);
 
-			mconn = db_conn(db_shost, "postfix", true);
+			mconn = db_conn(cfg->db_shost, "postfix", true);
 			sql_query(mconn, ld_sql, id, domain);
 
 			sql_query(mconn, fwd_sql, id, "root", domain,
@@ -539,7 +539,7 @@ static void delete_mail_domain(void)
 			MYSQL *mconn;
 
 			if (strcmp(type, "MX") == 0) {
-				mconn = db_conn(db_shost, "postfix", true);
+				mconn = db_conn(cfg->db_shost, "postfix", true);
 				sql_query(mconn, "DELETE FROM "
 						"postfix.relay_domains WHERE "
 						"domain_id = %d", domain_id);
@@ -548,7 +548,7 @@ static void delete_mail_domain(void)
 				sql_query(conn, "DELETE FROM "
 						"postfix.local_domains WHERE "
 						"domain_id = %d", domain_id);
-				mconn = db_conn(db_shost, "postfix", true);
+				mconn = db_conn(cfg->db_shost, "postfix", true);
 				sql_query(mconn, "DELETE FROM "
 						"postfix.local_domains WHERE "
 						"domain_id = %d", domain_id);
@@ -593,7 +593,7 @@ static void delete_mail_fwd_record(void)
 
 	sql_query(conn, d_sql, domain_id, record_id);
 
-	mconn = db_conn(db_shost, "postfix", true);
+	mconn = db_conn(cfg->db_shost, "postfix", true);
 	sql_query(mconn, d_sql, domain_id, record_id);
 	mysql_close(mconn);
 
@@ -630,7 +630,7 @@ static void issue_etrn(void)
 	hints.ai_flags = 0;
 	hints.ai_protocol = 0;
 
-	getaddrinfo(db_shost, "25", &hints, &res);
+	getaddrinfo(cfg->db_shost, "25", &hints, &res);
 	sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	connect(sockfd, res->ai_addr, res->ai_addrlen);
 	freeaddrinfo(res);
@@ -639,16 +639,17 @@ static void issue_etrn(void)
 	bytes_read = read(sockfd, buf, BUF_SIZE);
 	buf[bytes_read - 2] = '\0';
 	if (!strstr(buf, "ESMTP")) {
-		d_fprintf(error_log, "Unable to connect to %s:25\n", db_shost);
+		d_fprintf(error_log, "Unable to connect to %s:25\n",
+			  cfg->db_shost);
 		goto out;
 	}
 
 	/* Send HELO */
-	len = snprintf(buf, sizeof(buf), "HELO %s\r\n", db_host);
+	len = snprintf(buf, sizeof(buf), "HELO %s\r\n", cfg->db_host);
 	bytes_wrote = write(sockfd, buf, len);
 	if (bytes_wrote < len) {
 		d_fprintf(error_log, "Error issuing HELO to %s:25\n",
-			  db_shost);
+			  cfg->db_shost);
 		goto out;
 	}
 	bytes_read = read(sockfd, buf, BUF_SIZE);
@@ -672,7 +673,8 @@ static void issue_etrn(void)
 
 	bytes_wrote = write(sockfd, "QUIT\r\n", 6);
 	if (bytes_wrote < 6)
-		d_fprintf(error_log, "Error issuing QUIT to %s\n", db_shost);
+		d_fprintf(error_log, "Error issuing QUIT to %s\n",
+			  cfg->db_shost);
 	err = false;
 
 out:
@@ -698,18 +700,18 @@ static void __add_default_dns_records(unsigned long long id,
 	sql_query(conn, "INSERT INTO %s (%s) VALUES "
 			"(%llu, '%s', 'SOA', '%s %s 0 10800 3600 1209600 "
 			"900', 3600, %d)",
-			rdb, rfields, id, domain, PRIMARY_NS, hostmaster,
+			rdb, rfields, id, domain, cfg->primary_ns, hostmaster,
 			chtime);
 
 	/* NS Record */
 	sql_query(conn, "INSERT INTO %s (%s) VALUES "
 			"(%llu, '%s', 'NS', '%s', 3600, %d)",
-			rdb, rfields, id, domain, PRIMARY_NS, chtime);
+			rdb, rfields, id, domain, cfg->primary_ns, chtime);
 
 	/* NS Record */
 	sql_query(conn, "INSERT INTO %s (%s) VALUES "
 			"(%llu, '%s', 'NS', '%s', 3600, %d)",
-			rdb, rfields, id, domain, SECONDARY_NS, chtime);
+			rdb, rfields, id, domain, cfg->secondary_ns, chtime);
 
 	if (reverse)
 		return;
@@ -817,12 +819,12 @@ static void add_dns_domain(void)
 			id = mysql_insert_id(conn);
 
 			/* Add domain entry on slave server */
-			sconn = db_conn(db_shost, "pdns", true);
+			sconn = db_conn(cfg->db_shost, "pdns", true);
 			sql_query(sconn, "INSERT INTO pdns.domains (name, "
 					"master, type) VALUES "
 					"('%s', '%s', 'SLAVE')",
 					domain, master ? master :
-					PRIMARY_NS_IP);
+					cfg->primary_ns_ip);
 			mysql_close(sconn);
 
 			sql_query(conn, "INSERT INTO domains (uid, domain_id, "
@@ -908,7 +910,7 @@ static void delete_dns_domain(void)
 					"= %d", domain_id);
 
 			/* Delete from slave server */
-			sconn = db_conn(db_shost, "pdns", true);
+			sconn = db_conn(cfg->db_shost, "pdns", true);
 			sql_query(sconn, "DELETE FROM pdns.domains WHERE "
                                         "pdns.domains.name = '%s'", sdom);
 			mysql_close(sconn);
@@ -2716,7 +2718,7 @@ static void master_ns_ip(void)
 
 			sql_query(conn, u_sql, ip, domain, o_mip);
 
-			sconn = db_conn(db_shost, "pdns", true);
+			sconn = db_conn(cfg->db_shost, "pdns", true);
 			sql_query(sconn, u_sql, ip, domain, o_mip);
 			mysql_close(sconn);
 			free(domain);
@@ -3049,7 +3051,7 @@ static void backup_mx(void)
 			vl = add_html_var(vl, "etrn_ok", "no");
 	}
 
-	mconn = db_conn(db_shost, "postfix", true);
+	mconn = db_conn(cfg->db_shost, "postfix", true);
 	res = sql_query(mconn, "SELECT domain, queue_sz FROM relay_domains "
 			"WHERE domain_id = %d", domain_id);
 	db_row = get_dbrow(res);
@@ -3180,7 +3182,7 @@ static void mail_fwd_record(void)
 				"(domain_id, source, destination) "
 				"VALUES (%d, '%s@%s', '%s')";
 
-			mconn = db_conn(db_shost, "postfix", true);
+			mconn = db_conn(cfg->db_shost, "postfix", true);
 			if (IS_SET(qvar("update"))) {
 				sql_query(conn, u_fwd_sql, src, domain, dst,
 						domain_id, o_src);
@@ -3278,12 +3280,12 @@ static void paypal_ipn(void)
 		return;
 
 	/* Check our email address to catch spoofs */
-	if (strcmp(qvar("receiver_email"), PAYPAL_REC_EMAIL) != 0)
+	if (strcmp(qvar("receiver_email"), cfg->paypal_rec_email) != 0)
 		return;
 
 	snprintf(url, sizeof(url),
 			"https://%s/cgi-bin/webscr?cmd=_notify-validate&%s",
-			PAYPAL_HOST, post_buf);
+			cfg->paypal_host, post_buf);
 	response = fmemopen(rbuf, sizeof(rbuf) - 1, "w");
 
 	curl = curl_easy_init();
@@ -3386,10 +3388,10 @@ static void add_funds(void)
 		}
 		snprintf(uid, sizeof(uid), "%u", user_session.uid);
 		vl = add_html_var(vl, "uid", uid);
-		vl = add_html_var(vl, "paypal_bid", PAYPAL_BID);
+		vl = add_html_var(vl, "paypal_bid", cfg->paypal_bid);
 	}
-	vl = add_html_var(vl, "paypal_host", PAYPAL_HOST);
-	vl = add_html_var(vl, "app_host", APP_HOST);
+	vl = add_html_var(vl, "paypal_host", cfg->paypal_host);
+	vl = add_html_var(vl, "app_host", cfg->app_host);
 
 	vl = add_csrf_token(vl);
 	fmtlist = TMPL_add_fmt(fmtlist, "de_xss", de_xss);
@@ -3532,7 +3534,7 @@ static void renew(void)
 				MYSQL *sconn;
 
 				sql_query(conn, r_sql, domain_id);
-				sconn = db_conn(db_shost, "pdns", true);
+				sconn = db_conn(cfg->db_shost, "pdns", true);
 				sql_query(sconn, r_sql, domain_id);
 				if (strcmp(d_type, "SLAVE") == 0) {
 					const char *s_sql = "UPDATE "
@@ -3547,7 +3549,7 @@ static void renew(void)
 			} else if (expired && strcmp(m_type, "MX") == 0) {
 				MYSQL *sconn;
 
-				sconn = db_conn(db_shost, "pdns", true);
+				sconn = db_conn(cfg->db_shost, "pdns", true);
 				sql_query(sconn, "UPDATE postfix.relay_domains "					"SET enabled = 1 WHERE domain_id = %d",
 					domain_id);
 				mysql_close(sconn);
@@ -3557,7 +3559,7 @@ static void renew(void)
 				MYSQL *sconn;
 
 				sql_query(conn, u_sql, domain_id);
-				sconn = db_conn(db_shost, "postfix", true);
+				sconn = db_conn(cfg->db_shost, "postfix", true);
 				sql_query(sconn, u_sql, domain_id);
 				mysql_close(sconn);
 			}
@@ -3767,7 +3769,7 @@ static void overview(void)
 	snprintf(nr_rec, sizeof(nr_rec), "%lu", i);
 	ml = add_html_var(ml, "nr_mail", nr_rec);
 
-	ml = add_html_var(ml, "www_host", WWW_HOST);
+	ml = add_html_var(ml, "www_host", cfg->www_host);
 	fmtlist = TMPL_add_fmt(fmtlist, "de_xss", de_xss);
 	fmtlist = TMPL_add_fmt(fmtlist, "date", format_date_utc);
 	fmtlist = TMPL_add_fmt(fmtlist, "datetime", format_datetime_utc);
@@ -3820,7 +3822,7 @@ static void sign_up(void)
 
 out:
 	vl = add_html_var(vl, "email_addr", email_addr);
-	vl = add_html_var(vl, "www_host", WWW_HOST);
+	vl = add_html_var(vl, "www_host", cfg->www_host);
 
 	fmtlist = TMPL_add_fmt(fmtlist, "de_xss", de_xss);
 	send_template("templates/sign_up.tmpl", vl, fmtlist);
@@ -3927,7 +3929,7 @@ static void activate_account(void)
 		mysql_free_result(res);
 	}
 	vl = add_html_var(vl, "key", qvar("key"));
-	vl = add_html_var(vl, "www_host", WWW_HOST);
+	vl = add_html_var(vl, "www_host", cfg->www_host);
 
 	fmtlist = TMPL_add_fmt(fmtlist, "de_xss", de_xss);
 	send_template("templates/activate_account.tmpl", vl, fmtlist);
@@ -4183,7 +4185,7 @@ static void ips_and_hosts(void)
 	TMPL_varlist *vl = NULL;
 	TMPL_fmtlist *fmtlist = NULL;
 
-	vl = add_html_var(vl, "www_host", WWW_HOST);
+	vl = add_html_var(vl, "www_host", cfg->www_host);
 	fmtlist = TMPL_add_fmt(fmtlist, "de_xss", de_xss);
 	send_template("templates/ips_and_hosts.tmpl", vl, fmtlist);
 	TMPL_free_fmtlist(fmtlist);
@@ -4268,7 +4270,7 @@ void handle_request(void)
 	set_vars(post_buf);
 
 	/* Initialise the database connection for the master name server */
-	conn = db_conn(db_host, db_name, false);
+	conn = db_conn(cfg->db_host, cfg->db_name, false);
 	if (!conn)
 		goto out2;
 

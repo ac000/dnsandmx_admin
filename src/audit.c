@@ -245,7 +245,7 @@ bool is_logged_in(void)
 			env_vars.http_cookie + 11);
 
 	tdb = tctdbnew();
-	tctdbopen(tdb, SESSION_DB, TDBOREADER);
+	tctdbopen(tdb, cfg->session_db, TDBOREADER);
 
 	qry = tctdbqrynew(tdb);
 	tctdbqryaddcond(qry, "session_id", TDBQCSTREQ, session_id);
@@ -323,7 +323,7 @@ static void *log_utmp_host(void *arg)
 	 * Set the TLS conn variable so the subsequent
 	 * make_mysql_safe_string() will work.
 	 */
-	conn = db_conn(db_host, db_name, false);
+	conn = db_conn(cfg->db_host, cfg->db_name, false);
 	hostname = make_mysql_safe_string(host);
 	sql_query(conn, "UPDATE utmp SET hostname = '%s' WHERE sid = %llu",
 		  hostname, ui->sid);
@@ -487,7 +487,7 @@ void create_session(unsigned long long sid)
 	}
 
 	tdb = tctdbnew();
-	tctdbopen(tdb, SESSION_DB, TDBOWRITER | TDBOCREAT);
+	tctdbopen(tdb, cfg->session_db, TDBOWRITER | TDBOCREAT);
 	primary_key_size = sprintf(pkbuf, "%ld", (long)tctdbgenuid(tdb));
 	snprintf(timestamp, sizeof(timestamp), "%ld", (long)time(NULL));
 	snprintf(ssid, sizeof(ssid), "%llu", sid);
@@ -552,7 +552,7 @@ void set_user_session(void)
 				env_vars.http_cookie + 88);
 
 	tdb = tctdbnew();
-	tctdbopen(tdb, SESSION_DB, TDBOREADER | TDBOWRITER);
+	tctdbopen(tdb, cfg->session_db, TDBOREADER | TDBOWRITER);
 
 	/* Get the users stored session */
 	qry = tctdbqrynew(tdb);

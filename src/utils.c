@@ -417,7 +417,7 @@ char *get_tenant(const char *host, char *tenant)
 {
 	char *str;
 
-	if (!MULTI_TENANT || !host) {
+	if (!cfg->multi_tenant || !host) {
 		/*
 		 * We are either not in multi-tenancy mode and/or being run
 		 * due to a signal handler.
@@ -1046,9 +1046,9 @@ void free_user_session(void)
  */
 void send_reset_password_mail(const char *address, const char *key)
 {
-	FILE *fp = popen(MAIL_CMD, "w");
+	FILE *fp = popen(cfg->mail_cmd, "w");
 
-	fprintf(fp, "From: %s\r\n", MAIL_FROM);
+	fprintf(fp, "From: %s\r\n", cfg->mail_from);
 	fprintf(fp, "Subject: DNSandMX Password Reset Request\r\n");
 	fprintf(fp, "To: %s\r\n", address);
 	fputs("Content-Type: text/plain; charset=us-ascii\r\n", fp);
@@ -1074,9 +1074,9 @@ void send_reset_password_mail(const char *address, const char *key)
  */
 void send_disable_ipacl_mail(const char *address, const char *key)
 {
-	FILE *fp = popen(MAIL_CMD, "w");
+	FILE *fp = popen(cfg->mail_cmd, "w");
 
-	fprintf(fp, "From: %s\r\n", MAIL_FROM);
+	fprintf(fp, "From: %s\r\n", cfg->mail_from);
 	fprintf(fp, "Subject: DNSandMX IP ACL Deactivation Request\r\n");
 	fprintf(fp, "To: %s\r\n", address);
 	fputs("Content-Type: text/plain; charset=us-ascii\r\n", fp);
@@ -1102,9 +1102,9 @@ void send_disable_ipacl_mail(const char *address, const char *key)
  */
 void send_activation_mail(const char *address, const char *key)
 {
-	FILE *fp = popen(MAIL_CMD, "w");
+	FILE *fp = popen(cfg->mail_cmd, "w");
 
-	fprintf(fp, "From: %s\r\n", MAIL_FROM);
+	fprintf(fp, "From: %s\r\n", cfg->mail_from);
 	fprintf(fp, "Subject: DNSandMX Account Activation\r\n");
 	fprintf(fp, "To: %s\r\n", address);
 	fputs("Content-Type: text/plain; charset=us-ascii\r\n", fp);
@@ -1142,10 +1142,10 @@ void send_activation_mail(const char *address, const char *key)
 void send_expiry_mail(const char *name, const char *address,
 		      const char *domain, const char *type, time_t expires)
 {
-	FILE *fp = popen(MAIL_CMD, "w");
+	FILE *fp = popen(cfg->mail_cmd, "w");
 	struct tm *tm = gmtime(&expires);
 
-	fprintf(fp, "From: %s\r\n", MAIL_FROM);
+	fprintf(fp, "From: %s\r\n", cfg->mail_from);
 	fprintf(fp, "Subject: DNSandMX service expiry warning for %s\r\n",
 			domain);
 	fprintf(fp, "To: %s <%s>\r\n", name, address);
@@ -1178,10 +1178,10 @@ void send_expiry_mail(const char *name, const char *address,
 void send_expired_mail(const char *name, const char *address,
 		       const char *domain, const char *type, time_t expires)
 {
-	FILE *fp = popen(MAIL_CMD, "w");
+	FILE *fp = popen(cfg->mail_cmd, "w");
 	struct tm *tm = gmtime(&expires);
 
-	fprintf(fp, "From: %s\r\n", MAIL_FROM);
+	fprintf(fp, "From: %s\r\n", cfg->mail_from);
 	fprintf(fp, "Subject: DNSandMX service expiry notification for %s\r\n",
 			domain);
 	fprintf(fp, "To: %s <%s>\r\n", name, address);
@@ -1249,7 +1249,7 @@ void delete_user_session(unsigned int uid)
 	TCLIST *res;
 
 	tdb = tctdbnew();
-	tctdbopen(tdb, SESSION_DB, TDBOWRITER);
+	tctdbopen(tdb, cfg->session_db, TDBOWRITER);
 
 	snprintf(suid, sizeof(suid), "%u", uid);
 	qry = tctdbqrynew(tdb);

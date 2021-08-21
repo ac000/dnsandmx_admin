@@ -26,7 +26,7 @@
 
 #include <glib.h>
 
-#include "dax_config.h"
+#include "config.h"
 #include "db.h"
 #include "utils.h"
 
@@ -76,7 +76,7 @@
  */
 #define d_fprintf(stream, fmt, ...) \
 	do { \
-		if (stream == debug_log && !DEBUG_LEVEL) \
+		if (stream == debug_log && cfg->debug_level == 0) \
 			break; \
 		time_t secs = time(NULL); \
 		struct tm *tm = localtime(&secs); \
@@ -111,6 +111,11 @@ extern FILE *debug_log;
 extern GList *u_files;
 extern GList *avars;
 extern GHashTable *qvars;
+
+extern struct user_session user_session;
+extern struct env_vars env_vars;
+
+extern const struct cfg *cfg;
 
 /*
  * Wrapper around mysql_real_escape_string()
@@ -152,7 +157,6 @@ struct user_session {
 	char csrf_token[CSRF_LEN + 1];
 	bool restrict_ip;
 };
-struct user_session user_session;
 
 /*
  * This structure maps to the environment variable list sent
@@ -171,7 +175,6 @@ struct env_vars {
 	char *query_string;
 	char *http_referer;
 };
-struct env_vars env_vars;
 
 /* Structure to hold information about uploaded files via POST */
 struct file_info {

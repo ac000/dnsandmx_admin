@@ -19,7 +19,6 @@
 #include <time.h>
 
 #include "common.h"
-#include "dax_config.h"
 #include "utils.h"
 #include "db.h"
 
@@ -31,10 +30,6 @@
  */
 __thread MYSQL *conn;
 
-char *db_socket_name = NULL;
-unsigned int db_port_num = 3306;
-unsigned int db_flags = 0;
-
 /*
  * Opens up a MySQL connection and returns the connection handle.
  */
@@ -42,28 +37,34 @@ MYSQL *db_conn(const char *host, const char *db, bool ssl)
 {
 	MYSQL *ret;
 	MYSQL *mysql;
+	char *db_name;
 
-	if (MULTI_TENANT) {
+	if (cfg->multi_tenant) {
 		char tenant[TENANT_MAX + 1];
-		char db[sizeof(tenant) + 3] = "rm_";
+		int len;
 
 		get_tenant(env_vars.host, tenant);
-		strncat(db, tenant, sizeof(db) - strlen(db) - 1);
-		free(db_name);
-		db_name = strdup(db);
+		len = asprintf(&db_name, "rm_%s", tenant);
+		if (len == -1)
+			return NULL;
+	} else {
+		db_name = strdup(cfg->db_name);
 	}
+
 	mysql = mysql_init(NULL);
 	if (ssl)
 		mysql_ssl_set(mysql, NULL, NULL, NULL, NULL,
 				"DHE-RSA-AES256-SHA:AES128-SHA");
-	ret = mysql_real_connect(mysql, host, DB_USER, DB_PASS, db,
-			DB_PORT_NUM, DB_SOCKET_NAME, DB_FLAGS);
-
+	ret = mysql_real_connect(mysql, cfg->db_host, cfg->db_user,
+				 cfg->db_pass, db_name, cfg->db_port_num,
+				 cfg->db_socket_name, cfg->db_flags);
 	if (!ret) {
 		d_fprintf(error_log, "Failed to connect to database. Error: "
 				"%s\n", mysql_error(mysql));
 		mysql = NULL;
 	}
+	free(db_name);
+
 	return mysql;
 }
 
@@ -88,7 +89,7 @@ MYSQL_RES *__sql_query(MYSQL *mc, const char *func, const char *fmt, ...)
 	len = vsnprintf(sql, sizeof(sql), fmt, args);
 	va_end(args);
 
-	if (DEBUG_LEVEL) {
+	if (cfg->debug_level > 0) {
 		char tenant[TENANT_MAX + 1];
 		char ts_buf[32];
 		time_t secs = time(NULL);

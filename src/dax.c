@@ -26,8 +26,6 @@
 #include <fcgiapp.h>
 
 #include "common.h"
-#include "get_config.h"
-#include "dax_config.h"
 #include "url_handlers.h"
 #include "utils.h"
 #include "dax.h"
@@ -40,7 +38,6 @@ static volatile sig_atomic_t dump_sessions;
 static volatile sig_atomic_t housekeeping;
 static volatile sig_atomic_t rotate_log_files;
 
-char *log_dir = "/tmp";
 static char access_log_path[PATH_MAX];
 static char error_log_path[PATH_MAX];
 static char sql_log_path[PATH_MAX];
@@ -56,7 +53,10 @@ FILE *sql_log;
 FILE *error_log;
 FILE *debug_log;
 
-int debug_level = 0;
+struct user_session user_session;
+struct env_vars env_vars;
+
+const struct cfg *cfg;
 
 /*
  * Decide how many worker processes should be created.
@@ -71,12 +71,12 @@ int debug_level = 0;
  */
 static int get_nr_procs(void)
 {
-	if (NR_PROCS > 0)
-		return NR_PROCS;
+	if (cfg->nr_procs > 0)
+		return cfg->nr_procs;
 	else if (get_nprocs() > 0)
 		return get_nprocs();
-	else
-		return 1;
+
+	return 1;
 }
 
 /*
@@ -147,7 +147,7 @@ static void dump_session_state(void)
 	int nres;
 
 	tdb = tctdbnew();
-	tctdbopen(tdb, SESSION_DB, TDBOREADER);
+	tctdbopen(tdb, cfg->session_db, TDBOREADER);
 
 	qry = tctdbqrynew(tdb);
 	res = tctdbqrysearch(qry);
@@ -265,7 +265,7 @@ static void clear_old_sessions(void)
 	snprintf(expiry, sizeof(expiry), "%ld", time(NULL) - SESSION_EXPIRY);
 
 	tdb = tctdbnew();
-	tctdbopen(tdb, SESSION_DB, TDBOWRITER);
+	tctdbopen(tdb, cfg->session_db, TDBOWRITER);
 
 	qry = tctdbqrynew(tdb);
 	tctdbqryaddcond(qry, "last_seen", TDBQCNUMLT, expiry);
@@ -296,7 +296,7 @@ static void check_dns_domain_expiry(void)
 
 	d_fprintf(debug_log, "Looking for expired DNS domains\n");
 
-	mc = db_conn(db_host, db_name, false);
+	mc = db_conn(cfg->db_host, cfg->db_name, false);
 	/*
 	 * Get a list of DNS domains that are due to expire within 30 days.
 	 *
@@ -337,7 +337,7 @@ static void check_dns_domain_expiry(void)
 					"domain_id = %d", domain_id);
 			sql_query(mc, r_sql, domain_id);
 
-			sconn = db_conn(db_shost, "pdns", true);
+			sconn = db_conn(cfg->db_shost, "pdns", true);
 			sql_query(sconn, r_sql, domain_id);
 			if (strcmp(get_var(db_row, "type"), "SLAVE") == 0) {
 				const char *s_sql = "UPDATE pdns.domains SET "
@@ -389,7 +389,7 @@ static void check_mail_domain_expiry(void)
 
 	d_fprintf(debug_log, "Looking for expired Mail domains\n");
 
-	mc = db_conn(db_host, db_name, false);
+	mc = db_conn(cfg->db_host, cfg->db_name, false);
 	/*
 	 * Get a list of Mail domains that are due to expire within 30 days.
 	 *
@@ -428,7 +428,7 @@ static void check_mail_domain_expiry(void)
 			sql_query(mc, "UPDATE mail_domains SET expired = 1 "
 					"WHERE domain_id = %d", domain_id);
 
-			sconn = db_conn(db_shost, "postfix", true);
+			sconn = db_conn(cfg->db_shost, "postfix", true);
 			if (strcmp(m_type, "MX") == 0) {
 				sql_query(sconn, "UPDATE "
 						"postfix.relay_domains SET "
@@ -478,7 +478,7 @@ static void clear_pending_activations(void)
 {
 	MYSQL *mc;
 
-	mc = db_conn(db_host, db_name, false);
+	mc = db_conn(cfg->db_host, cfg->db_name, false);
 	sql_query(mc, "DELETE FROM pending_activations WHERE %ld > expires",
 		  time(NULL));
 	mysql_close(mc);
@@ -488,7 +488,7 @@ static void clear_pending_ipacl_deact(void)
 {
 	MYSQL *mc;
 
-	mc = db_conn(db_host, db_name, false);
+	mc = db_conn(cfg->db_host, cfg->db_name, false);
 	sql_query(mc, "DELETE FROM pending_ipacl_deact WHERE %ld > expires",
 		  time(NULL));
 	mysql_close(mc);
@@ -566,21 +566,24 @@ static void init_logs(void)
 	} else {
 		int err;
 
-		err = access(log_dir, R_OK | W_OK | X_OK);
+		err = access(cfg->log_dir, R_OK | W_OK | X_OK);
 		if (err == -1)
 			exit(EXIT_FAILURE);
-		snprintf(access_log_path, PATH_MAX, "%s/access.log", LOG_DIR);
-		snprintf(error_log_path, PATH_MAX, "%s/error.log", LOG_DIR);
-		snprintf(sql_log_path, PATH_MAX, "%s/sql.log", LOG_DIR);
-		snprintf(debug_log_path, PATH_MAX, "%s/debug.log", LOG_DIR);
+		snprintf(access_log_path, PATH_MAX, "%s/access.log",
+			 cfg->log_dir);
+		snprintf(error_log_path, PATH_MAX, "%s/error.log",
+			 cfg->log_dir);
+		snprintf(sql_log_path, PATH_MAX, "%s/sql.log", cfg->log_dir);
+		snprintf(debug_log_path, PATH_MAX, "%s/debug.log",
+			 cfg->log_dir);
 	}
 
 	/* Create the log files as -rw-r----- */
 	smask = umask(0027);
-	access_log = fopen(ACCESS_LOG, "a");
-	error_log = fopen(ERROR_LOG, "a");
-	sql_log = fopen(SQL_LOG, "a");
-	debug_log = fopen(DEBUG_LOG, "a");
+	access_log = fopen(access_log_path, "a");
+	error_log = fopen(error_log_path, "a");
+	sql_log = fopen(sql_log_path, "a");
+	debug_log = fopen(debug_log_path, "a");
 	umask(smask);
 
 	/* Make stderr point to the error_log */
@@ -669,8 +672,8 @@ int main(int argc, char **argv)
 	/* Used by set_proc_title() */
 	rargv = argv;
 
-	ret = get_config(argv[1]);
-	if (ret == -1)
+	cfg = get_config(argv[1]);
+	if (!cfg)
 		exit(EXIT_FAILURE);
 
 	/* Set the log paths and open them */
