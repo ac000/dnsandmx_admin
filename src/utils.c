@@ -1381,8 +1381,7 @@ void format_date_utc(const char *value, FCGX_Stream *out)
 	time_t seconds = atoi(value);
 	struct tm *tm = gmtime(&seconds);
 
-	snprintf(buf, sizeof(buf), "%04d-%02d-%02d", tm->tm_year + 1900,
-			tm->tm_mon + 1, tm->tm_mday);
+	strftime(buf, sizeof(buf), "%F", tm);
 	fcgx_p(buf);
 }
 
