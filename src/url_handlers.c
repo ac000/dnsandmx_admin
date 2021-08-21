@@ -3371,23 +3371,19 @@ static void add_funds(void)
 	if (IS_POST() && valid_csrf_token()) {
 		char uid[11];
 		int amount = atoi(qvar("dax_amount"));
-		bool form_err = false;
 
 		if (amount < 5 || amount % 5 > 0) {
-			form_err = true;
 			vl = add_html_var(vl, "amount_error", "yes");
-		} else {
-			vl = add_html_var(vl, "amount_error", "no");
-		}
-
-		if (form_err) {
-			vl = add_html_var(vl, "dax_amount", qvar("dax_amount"));
+			vl = add_html_var(vl, "dax_amount",
+					  qvar("dax_amount"));
 		} else {
 			char amnt[14];
 
+			vl = add_html_var(vl, "amount_error", "no");
 			snprintf(amnt, sizeof(amnt), "%d.00", amount);
 			vl = add_html_var(vl, "dax_amount", amnt);
 		}
+
 		snprintf(uid, sizeof(uid), "%u", user_session.uid);
 		vl = add_html_var(vl, "uid", uid);
 		vl = add_html_var(vl, "paypal_bid", cfg->paypal_bid);
