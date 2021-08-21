@@ -73,17 +73,17 @@ static int match_ipv6(const char *ip, const char *network, uint8_t prefixlen)
  */
 static int match_ipv4(const char *ip, const char *network, unsigned short cidr)
 {
-	struct in_addr addr;
-	uint32_t n_addr;
+	struct in_addr ip_addr;
+	struct in_addr net_addr;
 
-	inet_aton(ip, &addr);
-	n_addr = addr.s_addr & htonl(~0 << (32 - cidr));
-	addr.s_addr = n_addr;
+	inet_pton(AF_INET, network, &net_addr);
+	inet_pton(AF_INET, ip, &ip_addr);
 
-	if (strcmp(network, inet_ntoa(addr)) == 0)
+	ip_addr.s_addr &= htonl(~0UL << (32 - cidr));
+	if (ip_addr.s_addr == net_addr.s_addr)
 		return 0;
-	else
-		return -1;
+
+	return -1;
 }
 
 /*
