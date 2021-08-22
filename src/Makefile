@@ -1,46 +1,50 @@
-CC=gcc
-CFLAGS=-Wall -std=c99 -O2 -g -Wp,-D_FORTIFY_SOURCE=2 -D_FILE_OFFSET_BITS=64 -D_HAVE_FCGX -fexceptions -fstack-protector -fno-common --param=ssp-buffer-size=4 -fPIE
-LDFLAGS=-Wl,-z,now -pie
-LIBS=-L./libctemplate `pkg-config --libs glib-2.0` `pkg-config --libs gmime-2.6` `mysql_config --libs` -lm -lrt -lcrypt -lcurl -lfcgi -lmhash -ltokyocabinet -lctemplate-fcgx -pthread
-INCS=-I./libctemplate `pkg-config --cflags glib-2.0` `pkg-config --cflags gmime-2.6` `mysql_config --cflags`
+APPNAME	= dax
 
-objects = dax.o config.o url_handlers.o tools.o utils.o db.o audit.o csrf.o
+DEPDIR	:= .d
+$(shell mkdir -p $(DEPDIR) >/dev/null)
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
 
-dax: $(objects)
+CC	= gcc
+CFLAGS	= -Wall -Wvla -std=c99 -O2 -g \
+          -Wp,-D_FORTIFY_SOURCE=2 -D_FILE_OFFSET_BITS=64 -D_HAVE_FCGX \
+          -fexceptions -fno-common -fstack-protector --param=ssp-buffer-size=4 \
+	  -fPIE \
+          -I./libctemplate $(shell pkg-config --cflags glib-2.0 gmime-2.6) \
+          $(shell mysql_config --cflags)
+LDFLAGS	= -Wl,-z,relro,-z,now,-z,defs,--as-needed -pie
+LIBS	= -L./libctemplate $(shell pkg-config --libs glib-2.0 gmime-2.6) \
+          $(shell mysql_config --libs) -lm -lrt -lcrypt -lfcgi -lmhash \
+          -lcurl -ltokyocabinet -lctemplate-fcgx -pthread
+POSTCOMPILE = @mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d && touch $@
+
+sources  = $(wildcard *.c)
+objects  = $(sources:.c=.o)
+
+v = @
+ifeq ($V,1)
+	v =
+endif
+
+.PHONY: all
+all: $(APPNAME)
+
+$(APPNAME): $(objects)
 	@echo -e "  LNK\t$@"
-	@$(CC) $(LDFLAGS) -o dax $(objects) ${LIBS}
+	$(v)$(CC) $(LDFLAGS) -o $@ $(objects) $(LIBS)
 
-dax.o: common.h config.h url_handlers.h dax.h dax.c db.h
+%.o: %.c
+%.o: %.c $(DEPDIR)/%.d
 	@echo -e "  CC\t$@"
-	@$(CC) $(CFLAGS) -c dax.c ${INCS}
+	$(v)$(CC) $(DEPFLAGS) $(CFLAGS) -c -o $@ $<
+	$(POSTCOMPILE)
 
-url_handlers.o: common.h utils.h audit.h csrf.h tools.h url_handlers.c
-	@echo -e "  CC\t$@"
-	@$(CC) $(CFLAGS) -c url_handlers.c ${INCS}
+$(DEPDIR)/%.d: ;
+.PRECIOUS: $(DEPDIR)/%.d
 
-tools.o: common.h tools.h tools.c
-	@echo -e "  CC\t$@"
-	@$(CC) $(CFLAGS) -c tools.c ${INCS}
+include $(wildcard $(patsubst %,$(DEPDIR)/%.d,$(basename $(sources))))
 
-utils.o: common.h utils.h utils.c
-	@echo -e "  CC\t$@"
-	@$(CC) $(CFLAGS) -c utils.c ${INCS}
-
-db.o: common.h config.h utils.h db.h db.c
-	@echo -e "  CC\t$@"
-	@$(CC) $(CFLAGS) -c db.c ${INCS}
-
-config.o: config.h common.h config.c
-	@echo -e "  CC\t$@"
-	@$(CC) $(CFLAGS) -c config.c ${INCS}
-
-audit.o: common.h utils.h audit.c
-	@echo -e "  CC\t$@"
-	@$(CC) $(CFLAGS) -c audit.c ${INCS}
-
-csrf.o: common.h utils.h csrf.c
-	@echo -e "  CC\t$@"
-	@$(CC) $(CFLAGS) -c csrf.c ${INCS}
-
+.PHONY: clean
 clean:
-	rm -f dax *.o
+	$(v)rm -f $(APPNAME) $(objects)
+	$(v)rm -f $(DEPDIR)/*
+	$(v)rmdir $(DEPDIR)
