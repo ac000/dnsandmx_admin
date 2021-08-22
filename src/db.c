@@ -61,6 +61,7 @@ MYSQL *db_conn(const char *host, const char *db, bool ssl)
 	if (!ret) {
 		d_fprintf(error_log, "Failed to connect to database. Error: "
 				"%s\n", mysql_error(mysql));
+		mysql_close(mysql);
 		mysql = NULL;
 	}
 	free(db_name);
